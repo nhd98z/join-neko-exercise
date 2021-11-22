@@ -17,14 +17,14 @@ function App() {
   // setup
   const { activate, account, library } = useWeb3React();
   // b1
-  const [_balance, balance] = useState('');
+  const [balance, setBalance] = useState('');
   // b2
-  const [_sca, sca] = useState('');
+  const [sca, setSca] = useState('');
   // b3
-  const [_ra, ra] = useState('');
-  const [_amount, amount] = useState('');
+  const [ra, setRa] = useState('');
+  const [amount, setAmount] = useState('');
   // b4
-  const [_txStatus, txStatus] = useState([]);
+  const [txStatus, setTxStatus] = useState([]);
 
   const connect = () => {
     void activate(injected, async (error: Error) => {
@@ -45,7 +45,7 @@ function App() {
         const b = await signer.getBalance();
         const bb = new BigNumber(b.toString());
         const bbb = bb.dividedBy(new BigNumber(1e18)).toString();
-        balance(bbb);
+        setBalance(bbb);
       }
     })();
   }, [account, library]);
@@ -54,7 +54,7 @@ function App() {
     <>
       <h1>b1: connect bsc testnet</h1>
       <p>account: {account || '--'}</p>
-      <p>balance: {_balance || '--'} BNB</p>
+      <p>balance: {balance || '--'} BNB</p>
       <button
         onClick={() => {
           connect();
@@ -67,14 +67,14 @@ function App() {
       <hr />
 
       <h1>b2: input smart contract address, output its information</h1>
-      <input type="text" placeholder="Smart contract address" value={_sca} onChange={(e) => sca(e.target.value)} />
+      <input type="text" placeholder="Smart contract address" value={sca} onChange={(e) => setSca(e.target.value)} />
       <button onClick={() => {}}>show smart contract info</button>
 
       <hr />
 
       <h1>b3: send BNB to another address</h1>
-      <input type="text" placeholder="Recipient address" value={_ra} onChange={(e) => ra(e.target.value)} />
-      <input type="number" placeholder="Amount" value={_amount} onChange={(e) => amount(e.target.value)} />
+      <input type="text" placeholder="Recipient address" value={ra} onChange={(e) => setRa(e.target.value)} />
+      <input type="number" placeholder="Amount" value={amount} onChange={(e) => setAmount(e.target.value)} />
       <button onClick={() => {}}>send</button>
 
       <hr />
