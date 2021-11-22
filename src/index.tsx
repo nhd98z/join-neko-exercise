@@ -58,7 +58,13 @@ function App() {
   const raRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
   // b4
-  const [txStatus, setTxStatus] = useState([]);
+  const [txList, setTxList] = useState<{ hash: string; status: 'pending' | 'success' | 'failed' }[]>([]);
+  useEffect(() => {
+    const oldList = localStorage.getItem('tx-list');
+    if (oldList) {
+      setTxList(JSON.parse(oldList));
+    }
+  }, []);
 
   const connect = () => {
     void activate(injected, async (error: Error) => {
@@ -74,7 +80,7 @@ function App() {
   useEffect(() => {
     (async () => {
       if (account && library) {
-        const signer = await library.getSigner();
+        const signer = library.getSigner();
         const b = await signer.getBalance();
         const bb = new BigNumber(b.toString());
         const bbb = bb.dividedBy(new BigNumber(1e18)).toString();
@@ -82,6 +88,26 @@ function App() {
       }
     })();
   }, [account, library]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (library) {
+        const promises = txList.map(async (tx) => {
+          const receipt = await library.getTransactionReceipt(tx.hash);
+          return {
+            hash: tx.hash,
+            status: receipt?.status === 1 ? 'success' : receipt?.status === 0 ? 'failed' : 'pending'
+          } as { hash: string; status: 'pending' | 'success' | 'failed' };
+        });
+        const newTxList = await Promise.all(promises);
+        setTxList(newTxList);
+      }
+    }, 7000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [txList, library]);
 
   return (
     <>
@@ -127,13 +153,15 @@ function App() {
       <hr />
 
       <h1>b3: send BNB to another address</h1>
+      <p>Example: 0xDa0D8fF1bE1F78c5d349722A5800622EA31CD5dd</p>
       <input type="text" placeholder="Recipient address" ref={raRef} />
-      <input type="number" placeholder="Amount" disabled={!balance} ref={amountRef} />
+      <input type="number" placeholder="Amount" ref={amountRef} />
       <button
-        onClick={() => {
-          if (amountRef.current && raRef.current) {
+        onClick={async () => {
+          if (library && amountRef.current && raRef.current) {
             const ra = raRef.current.value;
             const amount = new BigNumber(amountRef.current.value);
+
             if (!isAddress(ra)) {
               alert('Invalid address.');
               return;
@@ -142,8 +170,21 @@ function App() {
               alert('Value cannot greater than balance.');
               return;
             }
+
+            const signer = library.getSigner();
+            const tx = await signer.sendTransaction({
+              from: account ?? undefined,
+              to: ra,
+              value: ethers.utils.parseEther(amountRef.current.value)
+            });
+            setTxList((prev: any) => {
+              const newOne = [...prev, { hash: tx.hash, status: 'pending' }];
+              localStorage.setItem('tx-list', JSON.stringify(newOne));
+              return newOne;
+            });
           }
         }}
+        disabled={!account}
       >
         send
       </button>
@@ -151,6 +192,22 @@ function App() {
       <hr />
 
       <h1>b4: follow transaction status</h1>
+      <button
+        onClick={() => {
+          setTxList([]);
+          localStorage.setItem('tx-list', JSON.stringify([]));
+        }}
+      >
+        clear
+      </button>
+      {txList.map((tx) => (
+        <p key={tx.hash}>
+          {tx.hash}:{' '}
+          <span style={{ color: tx.status === 'failed' ? 'red' : tx.status === 'success' ? 'green' : 'grey' }}>
+            {tx.status}
+          </span>
+        </p>
+      ))}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { nodes } from './getRpcUrl';
+import { nodes } from 'getRpcUrl';
 
 export const setupNetwork = async () => {
   const provider = window.ethereum;
