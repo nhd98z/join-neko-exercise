@@ -1,19 +1,60 @@
 import { StrictMode, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { UnsupportedChainIdError, Web3ReactProvider } from '@web3-react/core';
+import { UnsupportedChainIdError, useWeb3React, Web3ReactProvider } from '@web3-react/core';
 import { ethers } from 'ethers';
-import { setupNetwork } from 'wallet';
 import BigNumber from 'bignumber.js';
-import simpleRpcProvider from 'providers';
 import bep20Abi from 'erc20.json';
-import useActiveWeb3React from 'useActiveWeb3React';
 import { isAddress } from 'ethers/lib/utils';
+import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
+import { Web3Provider } from '@ethersproject/providers';
+
+export const nodes = [process.env.REACT_APP_NODE];
+
+export const simpleRpcProvider = new ethers.providers.StaticJsonRpcProvider(process.env.REACT_APP_NODE);
+
+const setupNetwork = async () => {
+  const provider = window.ethereum;
+  if (provider?.request) {
+    const chainId = 97;
+    try {
+      await provider.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: `0x${chainId.toString(16)}`,
+            chainName: 'Binance Smart Chain Testnet',
+            nativeCurrency: {
+              name: 'BNB',
+              symbol: 'bnb',
+              decimals: 18
+            },
+            rpcUrls: nodes,
+            blockExplorerUrls: ['https://testnet.bscscan.com']
+          }
+        ]
+      });
+      return true;
+    } catch (error) {
+      console.error('Failed to setup the network in Metamask:', error);
+      return false;
+    }
+  } else {
+    console.error("Can't setup the BSC network on metamask because window.ethereum is undefined");
+    return false;
+  }
+};
 
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
   DECIMAL_PLACES: 80
 });
+
+export const getLibrary = (provider: any): ethers.providers.Web3Provider => {
+  const library = new ethers.providers.Web3Provider(provider);
+  library.pollingInterval = 12000;
+  return library;
+};
 
 const injected = new InjectedConnector({ supportedChainIds: [97] });
 
@@ -34,17 +75,27 @@ export const useERC20 = (address: string) => {
   );
 };
 
-function App() {
-  // setup
-  const { activate, account, library } = useActiveWeb3React();
-  // b1
-  const [balance, setBalance] = useState('');
-  // b2
-  const scaRef = useRef<HTMLInputElement>(null);
-  const [sca, setSca] = useState('');
-  const contract = useERC20(sca);
-  const [contractIn4, setContractIn4] = useState<any>({});
+function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> {
+  const provider = useWeb3React();
 
+  return useMemo(
+    () => (provider.active ? provider : { ...provider, active: true, chainId: 97, library: simpleRpcProvider as any }),
+    [provider]
+  );
+}
+
+function App() {
+  const smartContractAddressRef = useRef<HTMLInputElement>(null);
+  const recipientAddressRef = useRef<HTMLInputElement>(null);
+  const amountRef = useRef<HTMLInputElement>(null);
+  const [balance, setBalance] = useState('');
+  const [smartContractAddress, setSmartContractAddress] = useState('');
+
+  const { activate, account, library } = useActiveWeb3React();
+  const contract = useERC20(smartContractAddress);
+
+  // set contract in4 when detect changes
+  const [contractIn4, setContractIn4] = useState<any>({});
   useEffect(() => {
     (async () => {
       if (contract) {
@@ -54,10 +105,7 @@ function App() {
     })();
   }, [contract]);
 
-  // b3
-  const raRef = useRef<HTMLInputElement>(null);
-  const amountRef = useRef<HTMLInputElement>(null);
-  // b4
+  // get tx list from localstorage
   const [txList, setTxList] = useState<{ hash: string; status: 'pending' | 'success' | 'failed' }[]>([]);
   useEffect(() => {
     const oldList = localStorage.getItem('tx-list');
@@ -66,17 +114,7 @@ function App() {
     }
   }, []);
 
-  const connect = () => {
-    void activate(injected, async (error: Error) => {
-      if (error instanceof UnsupportedChainIdError) {
-        const hasSetup = await setupNetwork();
-        if (hasSetup) {
-          await activate(injected);
-        }
-      }
-    });
-  };
-
+  // get balance
   useEffect(() => {
     (async () => {
       if (account && library) {
@@ -89,6 +127,7 @@ function App() {
     })();
   }, [account, library]);
 
+  // get tx status list every 7 seconds
   useEffect(() => {
     const interval = setInterval(async () => {
       if (library) {
@@ -101,6 +140,7 @@ function App() {
         });
         const newTxList = await Promise.all(promises);
         setTxList(newTxList);
+        localStorage.setItem('tx-list', JSON.stringify(newTxList));
       }
     }, 7000);
 
@@ -116,7 +156,14 @@ function App() {
       <p>balance: {balance || '--'} BNB</p>
       <button
         onClick={() => {
-          connect();
+          void activate(injected, async (error: Error) => {
+            if (error instanceof UnsupportedChainIdError) {
+              const hasSetup = await setupNetwork();
+              if (hasSetup) {
+                await activate(injected);
+              }
+            }
+          });
         }}
         disabled={!!account}
       >
@@ -126,7 +173,7 @@ function App() {
       <hr />
 
       <h1>b2: input bep20 smart contract address, output its information</h1>
-      <input type="text" placeholder="Smart contract address" ref={scaRef} />
+      <input type="text" placeholder="Smart contract address" ref={smartContractAddressRef} />
       <p>
         Example:{' '}
         <a href="https://testnet.bscscan.com/token/0x82f1ffcdb31433b63aa311295a69892eebcdc2bb">
@@ -138,9 +185,9 @@ function App() {
       <p>decimals: {contractIn4.decimals ?? '--'}</p>
       <button
         onClick={() => {
-          if (scaRef.current) {
-            if (isAddress(scaRef.current.value)) {
-              setSca(scaRef.current.value);
+          if (smartContractAddressRef.current) {
+            if (isAddress(smartContractAddressRef.current.value)) {
+              setSmartContractAddress(smartContractAddressRef.current.value);
             } else {
               alert('Address not valid.');
             }
@@ -154,12 +201,12 @@ function App() {
 
       <h1>b3: send BNB to another address</h1>
       <p>Example: 0xDa0D8fF1bE1F78c5d349722A5800622EA31CD5dd</p>
-      <input type="text" placeholder="Recipient address" ref={raRef} />
+      <input type="text" placeholder="Recipient address" ref={recipientAddressRef} />
       <input type="number" placeholder="Amount" ref={amountRef} />
       <button
         onClick={async () => {
-          if (library && amountRef.current && raRef.current) {
-            const ra = raRef.current.value;
+          if (library && amountRef.current && recipientAddressRef.current) {
+            const ra = recipientAddressRef.current.value;
             const amount = new BigNumber(amountRef.current.value);
 
             if (!isAddress(ra)) {
@@ -202,7 +249,10 @@ function App() {
       </button>
       {txList.map((tx) => (
         <p key={tx.hash}>
-          {tx.hash}:{' '}
+          <a target="_blank" rel="noreferrer" href={`https://testnet.bscscan.com/tx/${tx.hash}`}>
+            {tx.hash}
+          </a>
+          :{' '}
           <span style={{ color: tx.status === 'failed' ? 'red' : tx.status === 'success' ? 'green' : 'grey' }}>
             {tx.status}
           </span>
@@ -211,12 +261,6 @@ function App() {
     </>
   );
 }
-
-export const getLibrary = (provider: any): ethers.providers.Web3Provider => {
-  const library = new ethers.providers.Web3Provider(provider);
-  library.pollingInterval = 12000;
-  return library;
-};
 
 ReactDOM.render(
   <StrictMode>
