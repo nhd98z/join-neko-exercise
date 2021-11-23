@@ -116,15 +116,19 @@ function App() {
 
   // get balance
   useEffect(() => {
-    (async () => {
+    const getBalance = async () => {
       if (account && library) {
         const signer = library.getSigner();
-        const b = await signer.getBalance();
-        const bb = new BigNumber(b.toString());
-        const bbb = bb.dividedBy(new BigNumber(1e18)).toString();
-        setBalance(bbb);
+        const rawBalance = (await signer.getBalance()).toString();
+        const parsedBalance = ethers.utils.formatEther(rawBalance).toString();
+        setBalance(parsedBalance);
       }
-    })();
+    };
+    void getBalance();
+    const interval = setInterval(getBalance, 6000);
+    return () => {
+      clearInterval(interval);
+    };
   }, [account, library]);
 
   // get tx status list every 7 seconds
@@ -141,13 +145,21 @@ function App() {
         const newTxList = await Promise.all(promises);
         setTxList(newTxList);
         localStorage.setItem('tx-list', JSON.stringify(newTxList));
+        if (account) {
+          const signer = library.getSigner();
+          const rawBalance = (await signer.getBalance()).toString();
+          const parsedBalance = ethers.utils.formatEther(rawBalance).toString();
+          setBalance(parsedBalance);
+        }
       }
-    }, 7000);
+    }, 6000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [txList, library]);
+  }, [txList, library, account]);
+
+  console.log(`I'm here: `);
 
   return (
     <>
