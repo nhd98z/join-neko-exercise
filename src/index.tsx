@@ -6,12 +6,13 @@ import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 import bep20Abi from 'erc20.json';
 import { isAddress } from 'ethers/lib/utils';
+// eslint-disable-next-line import/no-unresolved
 import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
 import { Web3Provider } from '@ethersproject/providers';
 
-export const nodes = [process.env.REACT_APP_NODE];
+const nodes = [process.env.REACT_APP_NODE];
 
-export const simpleRpcProvider = new ethers.providers.StaticJsonRpcProvider(process.env.REACT_APP_NODE);
+const simpleRpcProvider = new ethers.providers.StaticJsonRpcProvider(process.env.REACT_APP_NODE);
 
 const setupNetwork = async () => {
   const provider = window.ethereum;
@@ -50,7 +51,7 @@ BigNumber.config({
   DECIMAL_PLACES: 80
 });
 
-export const getLibrary = (provider: any): ethers.providers.Web3Provider => {
+const getLibrary = (provider: any): ethers.providers.Web3Provider => {
   const library = new ethers.providers.Web3Provider(provider);
   library.pollingInterval = 12000;
   return library;
@@ -63,11 +64,11 @@ const getContract = (abi: any, address: string, signer?: ethers.Signer | ethers.
   return new ethers.Contract(address, abi, signerOrProvider);
 };
 
-export const getBep20Contract = (address: string, signer?: ethers.Signer | ethers.providers.Provider) => {
+const getBep20Contract = (address: string, signer?: ethers.Signer | ethers.providers.Provider) => {
   return getContract(bep20Abi, address, signer);
 };
 
-export const useERC20 = (address: string) => {
+const useERC20 = (address: string) => {
   const { library, account } = useActiveWeb3React();
   return useMemo(
     () => (address && library ? getBep20Contract(address, account ? library.getSigner() : undefined) : undefined),
@@ -124,7 +125,7 @@ function App() {
         setBalance(parsedBalance);
       }
     };
-    void getBalance();
+    getBalance();
     const interval = setInterval(getBalance, 6000);
     return () => {
       clearInterval(interval);
@@ -159,16 +160,15 @@ function App() {
     };
   }, [txList, library, account]);
 
-  console.log(`I'm here: `);
-
   return (
     <>
       <h1>b1: connect bsc testnet</h1>
       <p>account: {account || '--'}</p>
       <p>balance: {balance || '--'} BNB</p>
       <button
+        type="button"
         onClick={() => {
-          void activate(injected, async (error: Error) => {
+          activate(injected, async (error: Error) => {
             if (error instanceof UnsupportedChainIdError) {
               const hasSetup = await setupNetwork();
               if (hasSetup) {
@@ -196,6 +196,7 @@ function App() {
       <p>symbol: {contractIn4.symbol ?? '--'}</p>
       <p>decimals: {contractIn4.decimals ?? '--'}</p>
       <button
+        type="button"
         onClick={() => {
           if (smartContractAddressRef.current) {
             if (isAddress(smartContractAddressRef.current.value)) {
@@ -216,6 +217,7 @@ function App() {
       <input type="text" placeholder="Recipient address" ref={recipientAddressRef} />
       <input type="number" placeholder="Amount" ref={amountRef} />
       <button
+        type="button"
         onClick={async () => {
           if (library && amountRef.current && recipientAddressRef.current) {
             const ra = recipientAddressRef.current.value;
@@ -252,6 +254,7 @@ function App() {
 
       <h1>b4: follow transaction status</h1>
       <button
+        type="button"
         onClick={() => {
           setTxList([]);
           localStorage.setItem('tx-list', JSON.stringify([]));
