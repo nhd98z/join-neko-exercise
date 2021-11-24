@@ -5,20 +5,15 @@ import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 import { isAddress } from 'ethers/lib/utils';
 import _ from 'lodash';
-import setupNetwork from 'utils/setupNetwork';
+import setupNetwork from 'config/setupNetwork';
 import { injected } from 'config/connectors';
 import { getLibrary } from 'config/web3';
 import useActiveWeb3React from 'hooks/useActiveWeb3React';
 import { useBEP20Contract } from 'hooks/contracts';
 import { FAST_INTERVAL } from 'config/constants';
 import { useBNBBalance } from 'hooks/useBNBBalance';
-import { getFullDisplayBalance } from 'utils/formatBalance';
+import { getFullDisplayBalance } from 'utils/bigNumber';
 import { ETHER } from '@pancakeswap/sdk';
-
-BigNumber.config({
-  EXPONENTIAL_AT: 1000,
-  DECIMAL_PLACES: 80
-});
 
 function App() {
   const smartContractAddressRef = useRef<HTMLInputElement>(null);
