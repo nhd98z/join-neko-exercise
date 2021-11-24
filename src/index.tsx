@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useMemo, useRef, useState } from 'react';
+import { StrictMode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { UnsupportedChainIdError, useWeb3React, Web3ReactProvider } from '@web3-react/core';
@@ -6,9 +6,10 @@ import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 import bep20Abi from 'erc20.json';
 import { isAddress } from 'ethers/lib/utils';
+import { Web3Provider } from '@ethersproject/providers';
+import _ from 'lodash';
 // eslint-disable-next-line import/no-unresolved
 import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
-import { Web3Provider } from '@ethersproject/providers';
 
 const nodes = [process.env.REACT_APP_NODE];
 
@@ -107,58 +108,55 @@ function App() {
   }, [contract]);
 
   // get tx list from localstorage
-  const [txList, setTxList] = useState<{ hash: string; status: 'pending' | 'success' | 'failed' }[]>([]);
+  const [txs, setTxs] = useState<{ hash: string; status: 'pending' | 'success' | 'failed' }[]>([]);
   useEffect(() => {
-    const oldList = localStorage.getItem('tx-list');
-    if (oldList) {
-      setTxList(JSON.parse(oldList));
+    const lsTxs = localStorage.getItem('tx-list');
+    if (lsTxs) {
+      setTxs(JSON.parse(lsTxs));
     }
   }, []);
 
-  // get balance
-  useEffect(() => {
-    const getBalance = async () => {
-      if (account && library) {
-        const signer = library.getSigner();
-        const rawBalance = (await signer.getBalance()).toString();
-        const parsedBalance = ethers.utils.formatEther(rawBalance).toString();
-        setBalance(parsedBalance);
-      }
-    };
-    getBalance();
-    const interval = setInterval(getBalance, 6000);
-    return () => {
-      clearInterval(interval);
-    };
+  const getBalance = useCallback(async () => {
+    if (account && library) {
+      const signer = library.getSigner();
+      const rawBalance = (await signer.getBalance()).toString();
+      const parsedBalance = ethers.utils.formatEther(rawBalance).toString();
+      setBalance(parsedBalance);
+    }
   }, [account, library]);
 
-  // get tx status list every 7 seconds
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      if (library) {
-        const promises = txList.map(async (tx) => {
-          const receipt = await library.getTransactionReceipt(tx.hash);
-          return {
-            hash: tx.hash,
-            status: receipt?.status === 1 ? 'success' : receipt?.status === 0 ? 'failed' : 'pending'
-          } as { hash: string; status: 'pending' | 'success' | 'failed' };
-        });
-        const newTxList = await Promise.all(promises);
-        setTxList(newTxList);
-        localStorage.setItem('tx-list', JSON.stringify(newTxList));
-        if (account) {
-          const signer = library.getSigner();
-          const rawBalance = (await signer.getBalance()).toString();
-          const parsedBalance = ethers.utils.formatEther(rawBalance).toString();
-          setBalance(parsedBalance);
-        }
-      }
-    }, 6000);
+  const getTxStatuses = useCallback(async () => {
+    if (library) {
+      const promises = txs.map(async (tx) => {
+        if (tx.status !== 'pending') return tx;
 
+        const receipt = await library.getTransactionReceipt(tx.hash);
+        return {
+          hash: tx.hash,
+          status: receipt?.status === 1 ? 'success' : receipt?.status === 0 ? 'failed' : 'pending'
+        } as { hash: string; status: 'pending' | 'success' | 'failed' };
+      });
+      const newTxs = await Promise.all(promises);
+      if (!_.isEqual(newTxs, txs)) {
+        setTxs(newTxs);
+        localStorage.setItem('tx-list', JSON.stringify(newTxs));
+      }
+      await getBalance();
+    }
+  }, [txs, library, getBalance]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getTxStatuses();
+    }, 6000);
     return () => {
       clearInterval(interval);
     };
-  }, [txList, library, account]);
+  }, [getTxStatuses]);
+
+  useEffect(() => {
+    getBalance();
+  }, [getBalance]);
 
   return (
     <>
@@ -215,7 +213,7 @@ function App() {
       <h1>b3: send BNB to another address</h1>
       <p>Example: 0xDa0D8fF1bE1F78c5d349722A5800622EA31CD5dd</p>
       <input type="text" placeholder="Recipient address" ref={recipientAddressRef} />
-      <input type="number" placeholder="Amount" ref={amountRef} />
+      <input type="number" placeholder="Amount" ref={amountRef} step="0.01" min="0.01" />
       <button
         type="button"
         onClick={async () => {
@@ -238,7 +236,7 @@ function App() {
               to: ra,
               value: ethers.utils.parseEther(amountRef.current.value)
             });
-            setTxList((prev: any) => {
+            setTxs((prev: any) => {
               const newOne = [...prev, { hash: tx.hash, status: 'pending' }];
               localStorage.setItem('tx-list', JSON.stringify(newOne));
               return newOne;
@@ -256,13 +254,13 @@ function App() {
       <button
         type="button"
         onClick={() => {
-          setTxList([]);
+          setTxs([]);
           localStorage.setItem('tx-list', JSON.stringify([]));
         }}
       >
         clear
       </button>
-      {txList.map((tx) => (
+      {txs.map((tx) => (
         <p key={tx.hash}>
           <a target="_blank" rel="noreferrer" href={`https://testnet.bscscan.com/tx/${tx.hash}`}>
             {tx.hash}
