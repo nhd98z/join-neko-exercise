@@ -34,7 +34,10 @@
     "no-nested-ternary": 0,
     "max-classes-per-file": 0,
     // End temporary rules
+
+    // NHDz
     "react/react-in-jsx-scope": "off",
-    "no-alert": "off"
+    "no-alert": "off",
+    "@typescript-eslint/no-non-null-assertion": "off"
   }
 }

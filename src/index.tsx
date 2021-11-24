@@ -1,100 +1,36 @@
-import { StrictMode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { StrictMode, useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { UnsupportedChainIdError, useWeb3React, Web3ReactProvider } from '@web3-react/core';
+import { UnsupportedChainIdError, Web3ReactProvider } from '@web3-react/core';
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
-import bep20Abi from 'erc20.json';
 import { isAddress } from 'ethers/lib/utils';
-import { Web3Provider } from '@ethersproject/providers';
 import _ from 'lodash';
-// eslint-disable-next-line import/no-unresolved
-import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
-
-const nodes = [process.env.REACT_APP_NODE];
-
-const simpleRpcProvider = new ethers.providers.StaticJsonRpcProvider(process.env.REACT_APP_NODE);
-
-const setupNetwork = async () => {
-  const provider = window.ethereum;
-  if (provider?.request) {
-    const chainId = 97;
-    try {
-      await provider.request({
-        method: 'wallet_addEthereumChain',
-        params: [
-          {
-            chainId: `0x${chainId.toString(16)}`,
-            chainName: 'Binance Smart Chain Testnet',
-            nativeCurrency: {
-              name: 'BNB',
-              symbol: 'bnb',
-              decimals: 18
-            },
-            rpcUrls: nodes,
-            blockExplorerUrls: ['https://testnet.bscscan.com']
-          }
-        ]
-      });
-      return true;
-    } catch (error) {
-      console.error('Failed to setup the network in Metamask:', error);
-      return false;
-    }
-  } else {
-    console.error("Can't setup the BSC network on metamask because window.ethereum is undefined");
-    return false;
-  }
-};
+import setupNetwork from 'utils/setupNetwork';
+import { injected } from 'config/connectors';
+import { getLibrary } from 'config/web3';
+import useActiveWeb3React from 'hooks/useActiveWeb3React';
+import { useBEP20Contract } from 'hooks/contracts';
+import { FAST_INTERVAL } from 'config/constants';
+import { useBNBBalance } from 'hooks/useBNBBalance';
+import { getFullDisplayBalance } from 'utils/formatBalance';
+import { ETHER } from '@pancakeswap/sdk';
 
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
   DECIMAL_PLACES: 80
 });
 
-const getLibrary = (provider: any): ethers.providers.Web3Provider => {
-  const library = new ethers.providers.Web3Provider(provider);
-  library.pollingInterval = 12000;
-  return library;
-};
-
-const injected = new InjectedConnector({ supportedChainIds: [97] });
-
-const getContract = (abi: any, address: string, signer?: ethers.Signer | ethers.providers.Provider) => {
-  const signerOrProvider = signer ?? simpleRpcProvider;
-  return new ethers.Contract(address, abi, signerOrProvider);
-};
-
-const getBep20Contract = (address: string, signer?: ethers.Signer | ethers.providers.Provider) => {
-  return getContract(bep20Abi, address, signer);
-};
-
-const useERC20 = (address: string) => {
-  const { library, account } = useActiveWeb3React();
-  return useMemo(
-    () => (address && library ? getBep20Contract(address, account ? library.getSigner() : undefined) : undefined),
-    [account, address, library]
-  );
-};
-
-function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> {
-  const provider = useWeb3React();
-
-  return useMemo(
-    () => (provider.active ? provider : { ...provider, active: true, chainId: 97, library: simpleRpcProvider as any }),
-    [provider]
-  );
-}
-
 function App() {
   const smartContractAddressRef = useRef<HTMLInputElement>(null);
   const recipientAddressRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
-  const [balance, setBalance] = useState('');
+  const balance = useBNBBalance();
+  const formattedBalance = balance ? getFullDisplayBalance(balance, ETHER.decimals, ETHER.decimals) : '--';
+
   const [smartContractAddress, setSmartContractAddress] = useState('');
 
   const { activate, account, library } = useActiveWeb3React();
-  const contract = useERC20(smartContractAddress);
+  const contract = useBEP20Contract(smartContractAddress);
 
   // set contract in4 when detect changes
   const [contractIn4, setContractIn4] = useState<any>({});
@@ -116,15 +52,6 @@ function App() {
     }
   }, []);
 
-  const getBalance = useCallback(async () => {
-    if (account && library) {
-      const signer = library.getSigner();
-      const rawBalance = (await signer.getBalance()).toString();
-      const parsedBalance = ethers.utils.formatEther(rawBalance).toString();
-      setBalance(parsedBalance);
-    }
-  }, [account, library]);
-
   const getTxStatuses = useCallback(async () => {
     if (library) {
       const promises = txs.map(async (tx) => {
@@ -141,28 +68,23 @@ function App() {
         setTxs(newTxs);
         localStorage.setItem('tx-list', JSON.stringify(newTxs));
       }
-      await getBalance();
     }
-  }, [txs, library, getBalance]);
+  }, [txs, library]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       getTxStatuses();
-    }, 6000);
+    }, FAST_INTERVAL);
     return () => {
       clearInterval(interval);
     };
   }, [getTxStatuses]);
 
-  useEffect(() => {
-    getBalance();
-  }, [getBalance]);
-
   return (
     <>
       <h1>b1: connect bsc testnet</h1>
       <p>account: {account || '--'}</p>
-      <p>balance: {balance || '--'} BNB</p>
+      <p>balance: {formattedBalance} BNB</p>
       <button
         type="button"
         onClick={() => {
@@ -225,7 +147,7 @@ function App() {
               alert('Invalid address.');
               return;
             }
-            if (amount.isGreaterThan(balance)) {
+            if (balance && amount.isGreaterThan(balance)) {
               alert('Value cannot greater than balance.');
               return;
             }
