@@ -6,21 +6,22 @@ import BigNumber from 'bignumber.js';
 import { isAddress } from 'ethers/lib/utils';
 import _ from 'lodash';
 import setupNetwork from 'config/setupNetwork';
-import { injected } from 'config/connectors';
-import { getLibrary } from 'config/web3';
+import { getLibrary, injected } from 'config/web3';
 import useActiveWeb3React from 'hooks/useActiveWeb3React';
 import { useBEP20Contract } from 'hooks/contracts';
 import { FAST_INTERVAL } from 'config/constants';
-import { useBNBBalance } from 'hooks/useBNBBalance';
 import { getFullDisplayBalance } from 'utils/bigNumber';
-import { ETHER } from '@pancakeswap/sdk';
+import { Provider } from 'react-redux';
+import store from 'store';
+import { useBNBBalance } from 'store/application/hooks';
+import ApplicationUpdater from 'store/application/updater';
 
 function App() {
   const smartContractAddressRef = useRef<HTMLInputElement>(null);
   const recipientAddressRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
   const balance = useBNBBalance();
-  const formattedBalance = balance ? getFullDisplayBalance(balance, ETHER.decimals, ETHER.decimals) : '--';
+  const formattedBalance = balance ? getFullDisplayBalance(balance) : '--';
 
   const [smartContractAddress, setSmartContractAddress] = useState('');
 
@@ -195,7 +196,10 @@ function App() {
 ReactDOM.render(
   <StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}>
-      <App />
+      <Provider store={store}>
+        <ApplicationUpdater />
+        <App />
+      </Provider>
     </Web3ReactProvider>
   </StrictMode>,
   document.getElementById('root')

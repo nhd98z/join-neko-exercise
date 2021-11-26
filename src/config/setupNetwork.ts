@@ -1,4 +1,5 @@
-import { CHAIN_ID, nodes } from 'config/constants';
+import { BASE_BSC_SCAN_URLS, CHAIN_ID, nodes } from 'config/constants';
+import { ChainId } from '@pancakeswap/sdk';
 
 const setupNetwork = async () => {
   const provider = window.ethereum;
@@ -9,14 +10,14 @@ const setupNetwork = async () => {
         params: [
           {
             chainId: `0x${CHAIN_ID.toString(16)}`,
-            chainName: 'Binance Smart Chain Testnet',
+            chainName: `Binance Smart Chain ${CHAIN_ID === ChainId.MAINNET ? 'Mainnet' : 'Testnet'}`,
             nativeCurrency: {
               name: 'BNB',
               symbol: 'bnb',
               decimals: 18
             },
             rpcUrls: nodes,
-            blockExplorerUrls: ['https://testnet.bscscan.com']
+            blockExplorerUrls: [BASE_BSC_SCAN_URLS[CHAIN_ID]]
           }
         ]
       });
@@ -26,7 +27,7 @@ const setupNetwork = async () => {
       return false;
     }
   } else {
-    console.error('Can\'t setup the BSC network on metamask because window.ethereum is undefined');
+    console.error("Can't setup the BSC network on metamask because window.ethereum is undefined");
     return false;
   }
 };

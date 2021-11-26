@@ -1,8 +1,14 @@
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
+import { ChainId } from '@pancakeswap/sdk';
 
-export const CHAIN_ID = +process.env.REACT_APP_CHAIN_ID!;
+export const CHAIN_ID: ChainId = +process.env.REACT_APP_CHAIN_ID!;
+
+export const BASE_BSC_SCAN_URLS = {
+  [ChainId.MAINNET]: 'https://bscscan.com',
+  [ChainId.TESTNET]: 'https://testnet.bscscan.com'
+};
 
 const NODE_1 = process.env.REACT_APP_NODE_1!;
 const NODE_2 = process.env.REACT_APP_NODE_2!;
