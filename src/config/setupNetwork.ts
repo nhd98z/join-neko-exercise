@@ -1,7 +1,7 @@
 import { BASE_BSC_SCAN_URLS, CHAIN_ID, nodes } from 'config/constants';
 import { ChainId } from '@pancakeswap/sdk';
 
-const setupNetwork = async () => {
+export default async function setupNetwork() {
   const provider = window.ethereum;
   if (provider?.request) {
     try {
@@ -14,12 +14,12 @@ const setupNetwork = async () => {
             nativeCurrency: {
               name: 'BNB',
               symbol: 'bnb',
-              decimals: 18
+              decimals: 18,
             },
             rpcUrls: nodes,
-            blockExplorerUrls: [BASE_BSC_SCAN_URLS[CHAIN_ID]]
-          }
-        ]
+            blockExplorerUrls: [BASE_BSC_SCAN_URLS[CHAIN_ID]],
+          },
+        ],
       });
       return true;
     } catch (error) {
@@ -30,6 +30,4 @@ const setupNetwork = async () => {
     console.error("Can't setup the BSC network on metamask because window.ethereum is undefined");
     return false;
   }
-};
-
-export default setupNetwork;
+}

@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { FAST_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/useIsWindowVisible';
-import { useGetBalance } from 'store/application/hooks';
+import { useGetBalanceCallback } from 'store/application/hooks';
 
 export default function ApplicationUpdater() {
   const isWindowVisible = useIsWindowVisible();
   const timer = useRef<any>(null);
-  const getBalance = useGetBalance();
+  const getBalance = useGetBalanceCallback();
 
   useEffect(() => {
     if (isWindowVisible) {

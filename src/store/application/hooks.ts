@@ -1,19 +1,19 @@
-import { AppDispatch, AppState } from 'store';
-import { useDispatch, useSelector } from 'react-redux';
-import useActiveWeb3React from 'hooks/useActiveWeb3React';
+import { AppState, useAppDispatch } from 'store';
+import { useSelector } from 'react-redux';
+import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useCallback, useMemo } from 'react';
 import { updateBNBBalance } from 'store/application/actions';
 import { ethersToBigNumberInstance } from 'utils/bigNumber';
 import BigNumber from 'bignumber.js';
 
-export function useBNBBalance() {
+export function useBNBBalance(): BigNumber | undefined {
   const { bnbBalance } = useSelector<AppState, AppState['application']>((state) => state.application);
   return useMemo(() => bnbBalance && new BigNumber(bnbBalance), [bnbBalance]);
 }
 
-export function useGetBalance() {
+export function useGetBalanceCallback(): () => Promise<void> {
   const { account, library } = useActiveWeb3React();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   return useCallback(async () => {
     if (account && library) {
