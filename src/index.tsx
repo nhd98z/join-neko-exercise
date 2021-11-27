@@ -8,6 +8,7 @@ import ApplicationUpdater from 'components/updaters/ApplicationUpdater';
 import TransactionUpdater from 'components/updaters/TransactionUpdater';
 import App from 'pages/App';
 import BigNumber from 'bignumber.js';
+import 'index.scss';
 
 BigNumber.config({
   EXPONENTIAL_AT: 1000,
