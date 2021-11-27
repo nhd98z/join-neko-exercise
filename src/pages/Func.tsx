@@ -99,7 +99,7 @@ export default function Func() {
       <button
         type="button"
         onClick={async () => {
-          if (library && amountRef.current && recipientAddressRef.current) {
+          if (account && library && amountRef.current && recipientAddressRef.current) {
             const recipientAddress = recipientAddressRef.current.value;
             const amount = new BigNumber(amountRef.current.value);
 
@@ -112,7 +112,7 @@ export default function Func() {
               return;
             }
 
-            const signer = library.getSigner();
+            const signer = library.getSigner(account);
             const transactionResponse: ethers.providers.TransactionResponse = await signer.sendTransaction({
               from: account ?? undefined,
               to: recipientAddress,

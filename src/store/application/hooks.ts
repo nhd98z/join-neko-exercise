@@ -17,7 +17,7 @@ export function useGetBalanceCallback(): () => Promise<void> {
 
   return useCallback(async () => {
     if (account && library) {
-      const signer = library.getSigner();
+      const signer = library.getSigner(account);
       const weiBalance = await signer.getBalance();
       dispatch(updateBNBBalance({ bnbBalance: ethersToBigNumberInstance(weiBalance) }));
     }

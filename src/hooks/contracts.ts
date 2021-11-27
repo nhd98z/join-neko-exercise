@@ -15,9 +15,12 @@ function getBep20Contract(address: string, signer?: ethers.Signer | ethers.provi
 }
 
 export function useBEP20Contract(address: string): Contract | undefined {
-  const { library } = useActiveWeb3React();
+  const { account, library } = useActiveWeb3React();
   return useMemo(
-    () => (isAddress(address) ? getBep20Contract(address, library!.getSigner()) : undefined),
-    [address, library]
+    () =>
+      isAddress(address)
+        ? getBep20Contract(address, account && library ? library.getSigner(account) : library)
+        : undefined,
+    [address, account, library]
   );
 }
