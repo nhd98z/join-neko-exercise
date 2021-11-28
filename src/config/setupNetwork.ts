@@ -13,7 +13,7 @@ export default async function setupNetwork() {
             chainName: `Binance Smart Chain ${CHAIN_ID === ChainId.MAINNET ? 'Mainnet' : 'Testnet'}`,
             nativeCurrency: {
               name: 'BNB',
-              symbol: 'bnb',
+              symbol: 'BNB',
               decimals: 18,
             },
             rpcUrls: nodes,

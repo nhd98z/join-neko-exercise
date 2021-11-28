@@ -1,15 +1,8 @@
 import { Box } from 'components/Box';
 import Background from 'assets/background.svg';
 import PhoneHolding from 'assets/phone-holding.png';
-import { useEffect } from 'react';
 
 export default function Home() {
-  useEffect(() => {
-    setTimeout(() => {
-      alert(`Website vẫn đang hoàn thiện, vào path '/func' để sang trang on-chain function.`);
-    }, 1000);
-  }, []);
-
   return (
     <Box>
       <Box

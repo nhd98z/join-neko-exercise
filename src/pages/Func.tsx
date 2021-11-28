@@ -1,9 +1,8 @@
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useAppDispatch } from 'store';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useBNBBalance } from 'store/application/hooks';
 import { getFullDisplayBalance } from 'utils/bigNumber';
-import { useBEP20Contract } from 'hooks/contracts';
 import { useTransactionReceipts } from 'store/transactions/hooks';
 import { injected } from 'config/web3';
 import { UnsupportedChainIdError } from '@web3-react/core';
@@ -12,33 +11,27 @@ import { isAddress } from 'ethers/lib/utils';
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 import { addTransactionReceipt } from 'store/transactions/actions';
+import useBep20ContractInfo from 'hooks/useBEP20ContractInfo';
 
 export default function Func() {
   const { activate, account, library } = useActiveWeb3React();
   const dispatch = useAppDispatch();
 
-  const smartContractAddressRef = useRef<HTMLInputElement>(null);
-  const recipientAddressRef = useRef<HTMLInputElement>(null);
-  const amountRef = useRef<HTMLInputElement>(null);
-
+  // b1
   const balance = useBNBBalance();
   const formattedBalance = balance ? getFullDisplayBalance(balance) : '--';
 
-  const [smartContractAddress, setSmartContractAddress] = useState('');
-  const contract = useBEP20Contract(smartContractAddress);
+  // b2
+  const BEP20AddressRef = useRef<HTMLInputElement>(null);
+  const [BEP20Address, setBEP20Address] = useState('');
+  const { name, symbol, decimals } = useBep20ContractInfo(BEP20Address) ?? {};
 
+  // b3
+  const recipientAddressRef = useRef<HTMLInputElement>(null);
+  const amountRef = useRef<HTMLInputElement>(null);
+
+  // b4
   const transactionReceipts = useTransactionReceipts();
-
-  // set contract in4 when detect changes
-  const [contractIn4, setContractIn4] = useState<any>({});
-  useEffect(() => {
-    (async () => {
-      if (contract) {
-        const [name, symbol, decimals] = await Promise.all([contract.name(), contract.symbol(), contract.decimals()]);
-        setContractIn4({ name, symbol, decimals });
-      }
-    })();
-  }, [contract]);
 
   return (
     <>
@@ -65,22 +58,22 @@ export default function Func() {
       <hr />
 
       <h1>b2: input bep20 smart contract address, output its information</h1>
-      <input type="text" placeholder="Smart contract address" ref={smartContractAddressRef} />
+      <input type="text" placeholder="Smart contract address" ref={BEP20AddressRef} />
       <p>
         Example:{' '}
         <a href="https://testnet.bscscan.com/token/0x82f1ffcdb31433b63aa311295a69892eebcdc2bb">
           0x82f1ffcdb31433b63aa311295a69892eebcdc2bb
         </a>
       </p>
-      <p>name: {contractIn4.name ?? '--'}</p>
-      <p>symbol: {contractIn4.symbol ?? '--'}</p>
-      <p>decimals: {contractIn4.decimals ?? '--'}</p>
+      <p>name: {name ?? '--'}</p>
+      <p>symbol: {symbol ?? '--'}</p>
+      <p>decimals: {decimals ?? '--'}</p>
       <button
         type="button"
         onClick={() => {
-          if (smartContractAddressRef.current) {
-            if (isAddress(smartContractAddressRef.current.value)) {
-              setSmartContractAddress(smartContractAddressRef.current.value);
+          if (BEP20AddressRef.current) {
+            if (isAddress(BEP20AddressRef.current.value)) {
+              setBEP20Address(BEP20AddressRef.current.value);
             } else {
               alert('Address not valid.');
             }

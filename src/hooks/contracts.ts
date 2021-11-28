@@ -2,7 +2,7 @@ import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useMemo } from 'react';
 import { Contract, ethers } from 'ethers';
 import { simpleRpcProvider } from 'config/constants';
-import bep20Abi from 'config/abi/erc20.json';
+import bep20Abi from 'config/abi/bep20.json';
 import { isAddress } from 'ethers/lib/utils';
 
 function getContract(abi: any, address: string, signer?: ethers.Signer | ethers.providers.Provider) {
