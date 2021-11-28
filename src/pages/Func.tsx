@@ -1,21 +1,25 @@
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
-import { useAppDispatch } from 'store';
 import { useRef, useState } from 'react';
 import { useBNBBalance } from 'store/application/hooks';
 import { getFullDisplayBalance } from 'utils/bigNumber';
-import { useTransactionReceipts } from 'store/transactions/hooks';
+import {
+  useAddTransactionReceiptCallback,
+  useClearAllTransactionReceiptsCallback,
+  useTransactionReceipts,
+} from 'store/transactions/hooks';
 import { injected } from 'config/web3';
 import { UnsupportedChainIdError } from '@web3-react/core';
 import setupNetwork from 'config/setupNetwork';
 import { isAddress } from 'ethers/lib/utils';
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
-import { addTransactionReceipt } from 'store/transactions/actions';
 import useBep20ContractInfo from 'hooks/useBEP20ContractInfo';
+import { Box } from 'components/Box';
 
 export default function Func() {
   const { activate, account, library } = useActiveWeb3React();
-  const dispatch = useAppDispatch();
+  const addTransactionReceipt = useAddTransactionReceiptCallback();
+  const clearAllTransactionReceipts = useClearAllTransactionReceiptsCallback();
 
   // b1
   const balance = useBNBBalance();
@@ -34,8 +38,8 @@ export default function Func() {
   const transactionReceipts = useTransactionReceipts();
 
   return (
-    <>
-      <h1>b1: connect bsc testnet</h1>
+    <Box style={{ maxWidth: '800px', margin: '100px auto 0' }}>
+      <p>b1: connect bsc testnet</p>
       <p>account: {account || '--'}</p>
       <p>balance: {formattedBalance} BNB</p>
       <button
@@ -57,7 +61,7 @@ export default function Func() {
 
       <hr />
 
-      <h1>b2: input bep20 smart contract address, output its information</h1>
+      <p>b2: input bep20 smart contract address, output its information</p>
       <input type="text" placeholder="Smart contract address" ref={BEP20AddressRef} />
       <p>
         Example:{' '}
@@ -85,7 +89,7 @@ export default function Func() {
 
       <hr />
 
-      <h1>b3: send BNB to another address</h1>
+      <p>b3: send BNB to another address</p>
       <p>Example: 0xDa0D8fF1bE1F78c5d349722A5800622EA31CD5dd</p>
       <input type="text" placeholder="Recipient address" ref={recipientAddressRef} />
       <input type="number" placeholder="Amount" ref={amountRef} step="0.01" min="0.01" />
@@ -111,7 +115,7 @@ export default function Func() {
               to: recipientAddress,
               value: ethers.utils.parseEther(amountRef.current.value),
             });
-            dispatch(addTransactionReceipt({ transactionHash: transactionResponse.hash }));
+            addTransactionReceipt(transactionResponse.hash);
           }
         }}
         disabled={!account}
@@ -121,13 +125,8 @@ export default function Func() {
 
       <hr />
 
-      <h1>b4: follow transaction status</h1>
-      <button
-        type="button"
-        onClick={() => {
-          alert('Clear all transactions');
-        }}
-      >
+      <p>b4: follow transaction status</p>
+      <button type="button" onClick={clearAllTransactionReceipts}>
         clear
       </button>
       {transactionReceipts.map((transactionReceipt) => (
@@ -149,6 +148,6 @@ export default function Func() {
           </span>
         </p>
       ))}
-    </>
+    </Box>
   );
 }

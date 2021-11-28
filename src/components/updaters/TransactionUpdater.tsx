@@ -2,9 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { FAST_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/useIsWindowVisible';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
-import { useTransactionReceipts } from 'store/transactions/hooks';
-import { updateTransactionReceipt } from 'store/transactions/actions';
-import { useAppDispatch } from 'store';
+import { useTransactionReceipts, useUpdateTransactionReceiptCallback } from 'store/transactions/hooks';
 import { useGetBalanceCallback } from 'store/application/hooks';
 
 export default function TransactionUpdater() {
@@ -12,8 +10,8 @@ export default function TransactionUpdater() {
   const timer = useRef<any>(null);
   const { library } = useActiveWeb3React();
   const transactionReceipts = useTransactionReceipts();
-  const dispatch = useAppDispatch();
   const getBalance = useGetBalanceCallback();
+  const updateTransactionReceipt = useUpdateTransactionReceiptCallback();
 
   const getTransactionReceipts = useCallback(async () => {
     if (library) {
@@ -22,12 +20,10 @@ export default function TransactionUpdater() {
 
         library.getTransactionReceipt(transactionReceipt.transactionHash).then((newTransactionReceipt) => {
           if (newTransactionReceipt) {
-            dispatch(
-              updateTransactionReceipt({
-                transactionHash: newTransactionReceipt.transactionHash,
-                status: newTransactionReceipt.status,
-              })
-            );
+            updateTransactionReceipt({
+              transactionHash: newTransactionReceipt.transactionHash,
+              status: newTransactionReceipt.status,
+            });
             if (newTransactionReceipt.status) {
               getBalance();
             }
@@ -35,7 +31,7 @@ export default function TransactionUpdater() {
         });
       });
     }
-  }, [dispatch, library, transactionReceipts, getBalance]);
+  }, [library, transactionReceipts, getBalance, updateTransactionReceipt]);
 
   useEffect(() => {
     if (isWindowVisible) {

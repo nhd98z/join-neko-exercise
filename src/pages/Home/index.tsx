@@ -59,7 +59,7 @@ export default function Home() {
             />
           </span>
         </Text>
-        <Flex mt="60px" style={{ gap: '20px' }}>
+        <Flex mt="96px" style={{ gap: '20px' }}>
           <Box tabIndex={0} style={{ cursor: 'pointer' }}>
             <img src={GGPlay} alt="gg-play" />
           </Box>

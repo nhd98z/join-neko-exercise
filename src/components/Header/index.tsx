@@ -44,7 +44,9 @@ export default function Header() {
     <FixedBox>
       <Flex p="27px 205px 27px 95px" justifyContent="space-between">
         <Flex style={{ gap: '60px' }}>
-          <img src={LogoText} alt="logo-text" />
+          <Box tabIndex={0} style={{ cursor: 'pointer' }}>
+            <img src={LogoText} alt="logo-text" />
+          </Box>
           <MenuItem text="EN" />
         </Flex>
         <Flex style={{ gap: '60px' }}>

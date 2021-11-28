@@ -9,3 +9,4 @@ export const addTransactionReceipt = createAction<{ transactionHash: string }>('
 export const updateTransactionReceipt = createAction<{ transactionHash: string; status?: number }>(
   'transactions/updateTransactionReceipt'
 );
+export const clearAllTransactionReceipts = createAction('transactions/clearAllTransactionReceipts');

@@ -1,8 +1,9 @@
 import { createReducer } from '@reduxjs/toolkit';
 import {
-  addTransactionReceipt,
   SerializedTransactionReceipt,
+  addTransactionReceipt,
   updateTransactionReceipt,
+  clearAllTransactionReceipts,
 } from 'store/transactions/actions';
 
 export interface TransactionState {
@@ -18,5 +19,8 @@ export default createReducer<TransactionState>(initialState, (builder) =>
     })
     .addCase(updateTransactionReceipt, (state, { payload: { transactionHash, status } }) => {
       state[transactionHash] = { ...state[transactionHash], status };
-    }),
+    })
+    .addCase(clearAllTransactionReceipts, (state) => {
+      Object.keys(state).forEach((key) => delete state[key]);
+    })
 );
