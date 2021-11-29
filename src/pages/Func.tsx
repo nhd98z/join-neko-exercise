@@ -124,7 +124,6 @@ export default function Func() {
       </button>
 
       <hr />
-
       <p>b4: follow transaction status</p>
       <button type="button" onClick={clearAllTransactionReceipts}>
         clear
