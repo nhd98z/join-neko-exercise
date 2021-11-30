@@ -2,7 +2,7 @@ import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useMemo, useRef, useState } from 'react';
 import { useBNBBalance, useTokenBalances } from 'store/application/hooks';
 import { getFullDisplayBalance } from 'utils/bigNumber';
-import { useClearAllTransactionsCallback, useArrayTransactions } from 'store/transactions/hooks';
+import { useArrayTransactions, useClearAllTransactionsCallback } from 'store/transactions/hooks';
 import { injected } from 'config/web3';
 import { UnsupportedChainIdError } from '@web3-react/core';
 import setupNetwork from 'config/setupNetwork';
@@ -14,9 +14,6 @@ import useTokens from 'hooks/useTokens';
 import BigNumber from 'bignumber.js';
 
 export default function Func() {
-  const renderTime = useRef(0);
-  console.log(`Func render: ${++renderTime.current}`);
-
   // b1
   const { activate, account } = useActiveWeb3React();
   const balance = useBNBBalance();
