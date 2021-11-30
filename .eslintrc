@@ -39,6 +39,6 @@
     "react/react-in-jsx-scope": "off",
     "no-alert": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "spaced-comment": "warn"
+    "spaced-comment": "off"
   }
 }

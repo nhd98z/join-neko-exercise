@@ -3,21 +3,24 @@ import { load, save } from 'redux-localstorage-simple';
 import cloneDeep from 'lodash/cloneDeep';
 import { useDispatch } from 'react-redux';
 import application from 'store/application/reducer';
-import transactions, { initialState as transactionsInitialState } from './transactions/reducer';
+import transactions, { initialState as transactionsInitialState } from 'store/transactions/reducer';
+import tokens, { initialState as tokenInitialState } from 'store/tokens/reducer';
 
-const PERSISTED_KEYS: string[] = ['transactions'];
+const PERSISTED_KEYS: string[] = ['transactions', 'tokens'];
 
 const store = configureStore({
   devTools: process.env.NODE_ENV !== 'production',
   reducer: {
     application,
     transactions,
+    tokens,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({ thunk: true }).concat(save({ states: PERSISTED_KEYS })),
   preloadedState: load({
     states: PERSISTED_KEYS,
     preloadedState: {
-      application: cloneDeep(transactionsInitialState),
+      transactions: cloneDeep(transactionsInitialState),
+      tokens: cloneDeep(tokenInitialState),
     },
   }),
 });
