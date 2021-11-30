@@ -1,12 +1,12 @@
 import { createAction } from '@reduxjs/toolkit';
 
-export interface SerializedTransactionReceipt {
+export interface SerializedTransaction {
   transactionHash: string;
   status?: number;
 }
 
-export const addTransactionReceipt = createAction<{ transactionHash: string }>('transactions/addTransactionReceipt');
-export const updateTransactionReceipt = createAction<{ transactionHash: string; status?: number }>(
-  'transactions/updateTransactionReceipt'
+export const addTransaction = createAction<{ transactionHash: string }>('transactions/addTransaction');
+export const updateTransaction = createAction<{ transactionHash: string; status?: number }>(
+  'transactions/updateTransaction'
 );
-export const clearAllTransactionReceipts = createAction('transactions/clearAllTransactionReceipts');
+export const clearAllTransactions = createAction('transactions/clearAllTransactions');

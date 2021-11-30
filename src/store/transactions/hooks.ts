@@ -2,28 +2,28 @@ import { AppState, useAppDispatch } from 'store';
 import { useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
 import {
-  addTransactionReceipt,
-  clearAllTransactionReceipts,
-  SerializedTransactionReceipt,
-  updateTransactionReceipt,
+  addTransaction,
+  clearAllTransactions,
+  SerializedTransaction,
+  updateTransaction,
 } from 'store/transactions/actions';
 
-export function useTransactionReceipts(): SerializedTransactionReceipt[] {
+export function useArrayTransactions(): SerializedTransaction[] {
   const receipts = useSelector<AppState, AppState['transactions']>((state) => state.transactions);
   return useMemo(() => Object.keys(receipts).map((transactionHash) => receipts[transactionHash]), [receipts]);
 }
 
-export function useAddTransactionReceiptCallback(): (transactionHash: string) => void {
+export function useAddTransactionCallback(): (transactionHash: string) => void {
   const dispatch = useAppDispatch();
   return useCallback(
     (transactionHash: string) => {
-      dispatch(addTransactionReceipt({ transactionHash }));
+      dispatch(addTransaction({ transactionHash }));
     },
     [dispatch]
   );
 }
 
-export function useUpdateTransactionReceiptCallback(): ({
+export function useUpdateTransactionCallback(): ({
   transactionHash,
   status,
 }: {
@@ -33,15 +33,15 @@ export function useUpdateTransactionReceiptCallback(): ({
   const dispatch = useAppDispatch();
   return useCallback(
     ({ transactionHash, status }) => {
-      dispatch(updateTransactionReceipt({ transactionHash, status }));
+      dispatch(updateTransaction({ transactionHash, status }));
     },
     [dispatch]
   );
 }
 
-export function useClearAllTransactionReceiptsCallback(): () => void {
+export function useClearAllTransactionsCallback(): () => void {
   const dispatch = useAppDispatch();
   return useCallback(() => {
-    dispatch(clearAllTransactionReceipts());
+    dispatch(clearAllTransactions());
   }, [dispatch]);
 }

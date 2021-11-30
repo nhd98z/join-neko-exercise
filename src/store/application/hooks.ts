@@ -87,6 +87,6 @@ export function useGetTokenBalancesAndSyncToStoreCallback() {
       getTokenBalanceAndSyncToStore(trackingTokenAddresses[index], contract)
     );
 
-    Promise.all(promises);
+    Promise.allSettled(promises);
   }, [account, contracts, dispatch, trackingTokenAddresses]);
 }

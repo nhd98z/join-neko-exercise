@@ -2,41 +2,41 @@ import { useCallback, useEffect, useRef } from 'react';
 import { FAST_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/useIsWindowVisible';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
-import { useTransactionReceipts, useUpdateTransactionReceiptCallback } from 'store/transactions/hooks';
+import { useArrayTransactions, useUpdateTransactionCallback } from 'store/transactions/hooks';
 import { useGetBNBBalanceAndSyncToStoreCallback } from 'store/application/hooks';
 
 export default function TransactionsUpdater() {
   const isWindowVisible = useIsWindowVisible();
   const timer = useRef<any>(null);
   const { library } = useActiveWeb3React();
-  const transactionReceipts = useTransactionReceipts();
+  const transactions = useArrayTransactions();
   const getBalance = useGetBNBBalanceAndSyncToStoreCallback();
-  const updateTransactionReceipt = useUpdateTransactionReceiptCallback();
+  const updateTransaction = useUpdateTransactionCallback();
 
-  const getTransactionReceipts = useCallback(async () => {
+  const getTransactions = useCallback(async () => {
     if (library) {
-      transactionReceipts.forEach((transactionReceipt) => {
-        if (transactionReceipt.status !== undefined) return;
+      transactions.forEach((transaction) => {
+        if (transaction.status !== undefined) return;
 
-        library.getTransactionReceipt(transactionReceipt.transactionHash).then((newTransactionReceipt) => {
-          if (newTransactionReceipt) {
-            updateTransactionReceipt({
-              transactionHash: newTransactionReceipt.transactionHash,
-              status: newTransactionReceipt.status,
+        library.getTransactionReceipt(transaction.transactionHash).then((newTransaction) => {
+          if (newTransaction) {
+            updateTransaction({
+              transactionHash: newTransaction.transactionHash,
+              status: newTransaction.status,
             });
-            if (newTransactionReceipt.status) {
+            if (newTransaction.status) {
               getBalance();
             }
           }
         });
       });
     }
-  }, [library, transactionReceipts, getBalance, updateTransactionReceipt]);
+  }, [library, transactions, getBalance, updateTransaction]);
 
   useEffect(() => {
     if (isWindowVisible) {
-      getTransactionReceipts();
-      timer.current = setInterval(getTransactionReceipts, FAST_INTERVAL);
+      getTransactions();
+      timer.current = setInterval(getTransactions, FAST_INTERVAL);
     } else {
       clearInterval(timer.current);
     }
@@ -44,7 +44,7 @@ export default function TransactionsUpdater() {
     return () => {
       clearInterval(timer.current);
     };
-  }, [isWindowVisible, getTransactionReceipts]);
+  }, [isWindowVisible, getTransactions]);
 
   return null;
 }

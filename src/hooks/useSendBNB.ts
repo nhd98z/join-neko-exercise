@@ -5,13 +5,13 @@ import invariant from 'tiny-invariant';
 import { ethers } from 'ethers';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useCallback } from 'react';
-import { useAddTransactionReceiptCallback } from 'store/transactions/hooks';
+import { useAddTransactionCallback } from 'store/transactions/hooks';
 import { getDecimalAmount } from 'utils/bigNumber';
 
 export default function useSendBNBCallback() {
   const balance = useBNBBalance();
   const { library, account } = useActiveWeb3React();
-  const addTransactionReceipt = useAddTransactionReceiptCallback();
+  const addTransactionReceipt = useAddTransactionCallback();
 
   return useCallback(
     async (recipientAddress: string, amountBNB: string) => {

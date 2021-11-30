@@ -2,7 +2,7 @@ import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useMemo, useRef, useState } from 'react';
 import { useBNBBalance, useTokenBalances } from 'store/application/hooks';
 import { getFullDisplayBalance } from 'utils/bigNumber';
-import { useClearAllTransactionReceiptsCallback, useTransactionReceipts } from 'store/transactions/hooks';
+import { useClearAllTransactionsCallback, useArrayTransactions } from 'store/transactions/hooks';
 import { injected } from 'config/web3';
 import { UnsupportedChainIdError } from '@web3-react/core';
 import setupNetwork from 'config/setupNetwork';
@@ -15,13 +15,13 @@ import BigNumber from 'bignumber.js';
 
 export default function Func() {
   const renderTime = useRef(0);
-  // console.log(`Func render: ${++renderTime.current}`);
+  console.log(`Func render: ${++renderTime.current}`);
 
   // b1
   const { activate, account } = useActiveWeb3React();
   const balance = useBNBBalance();
   const formattedBalance = balance ? getFullDisplayBalance(balance) : '--';
-  const trackingToken = useArrayTrackingTokens();
+  const trackingTokens = useArrayTrackingTokens();
   const tokenBalances = useTokenBalances();
 
   // b2
@@ -37,15 +37,15 @@ export default function Func() {
   const sendBNB = useSendBNBCallback();
 
   // b4
-  const transactionReceipts = useTransactionReceipts();
-  const clearAllTransactionReceipts = useClearAllTransactionReceiptsCallback();
+  const transactionReceipts = useArrayTransactions();
+  const clearAllTransactionReceipts = useClearAllTransactionsCallback();
 
   return (
     <Box style={{ maxWidth: '800px', margin: 'auto' }}>
       <p>b1: connect bsc testnet</p>
       <p>account: {account || '--'}</p>
       <p>balance: {formattedBalance} BNB</p>
-      {trackingToken.map(({ address, token }) => {
+      {trackingTokens.map(({ address, token }) => {
         if (!token) return null;
         const tokenBalance = tokenBalances[address];
         return (
