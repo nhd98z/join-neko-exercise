@@ -4,8 +4,9 @@ import { Web3ReactProvider } from '@web3-react/core';
 import { getLibrary } from 'config/web3';
 import { Provider } from 'react-redux';
 import store from 'store';
-import ApplicationUpdater from 'components/updaters/ApplicationUpdater';
-import TransactionUpdater from 'components/updaters/TransactionUpdater';
+import ApplicationUpdater from 'store/application/updater';
+import TransactionsUpdater from 'store/transactions/updater';
+import TokensUpdater from 'store/tokens/updater';
 import App from 'pages/App';
 import BigNumber from 'bignumber.js';
 import 'index.scss';
@@ -19,10 +20,13 @@ function Updaters() {
   return (
     <>
       <ApplicationUpdater />
-      <TransactionUpdater />
+      <TransactionsUpdater />
+      <TokensUpdater />
     </>
   );
 }
+
+window._store = store;
 
 ReactDOM.render(
   <StrictMode>

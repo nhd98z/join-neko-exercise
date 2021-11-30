@@ -3,14 +3,14 @@ import { FAST_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/useIsWindowVisible';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useTransactionReceipts, useUpdateTransactionReceiptCallback } from 'store/transactions/hooks';
-import { useGetBalanceCallback } from 'store/application/hooks';
+import { useGetBNBBalanceAndSyncToStoreCallback } from 'store/application/hooks';
 
-export default function TransactionUpdater() {
+export default function TransactionsUpdater() {
   const isWindowVisible = useIsWindowVisible();
   const timer = useRef<any>(null);
   const { library } = useActiveWeb3React();
   const transactionReceipts = useTransactionReceipts();
-  const getBalance = useGetBalanceCallback();
+  const getBalance = useGetBNBBalanceAndSyncToStoreCallback();
   const updateTransactionReceipt = useUpdateTransactionReceiptCallback();
 
   const getTransactionReceipts = useCallback(async () => {

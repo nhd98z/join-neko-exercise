@@ -6,6 +6,8 @@ import { BsChevronDown } from 'react-icons/all';
 
 const FixedBox = styled(Box)`
   position: fixed;
+  top: 0;
+  left: 0;
   z-index: 1;
   width: 100%;
 `;

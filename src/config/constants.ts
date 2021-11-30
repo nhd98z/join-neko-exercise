@@ -7,7 +7,7 @@ export const CHAIN_ID: ChainId = +process.env.REACT_APP_CHAIN_ID!;
 
 export const BASE_BSC_SCAN_URLS = {
   [ChainId.MAINNET]: 'https://bscscan.com',
-  [ChainId.TESTNET]: 'https://testnet.bscscan.com'
+  [ChainId.TESTNET]: 'https://testnet.bscscan.com',
 };
 
 const NODE_1 = process.env.REACT_APP_NODE_1!;

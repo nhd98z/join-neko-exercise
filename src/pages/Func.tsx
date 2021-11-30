@@ -1,47 +1,59 @@
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
-import { useRef, useState } from 'react';
-import { useBNBBalance } from 'store/application/hooks';
+import { useMemo, useRef, useState } from 'react';
+import { useBNBBalance, useTokenBalances } from 'store/application/hooks';
 import { getFullDisplayBalance } from 'utils/bigNumber';
-import {
-  useAddTransactionReceiptCallback,
-  useClearAllTransactionReceiptsCallback,
-  useTransactionReceipts,
-} from 'store/transactions/hooks';
+import { useClearAllTransactionReceiptsCallback, useTransactionReceipts } from 'store/transactions/hooks';
 import { injected } from 'config/web3';
 import { UnsupportedChainIdError } from '@web3-react/core';
 import setupNetwork from 'config/setupNetwork';
 import { isAddress } from 'ethers/lib/utils';
-import BigNumber from 'bignumber.js';
-import { ethers } from 'ethers';
-import useBep20ContractInfo from 'hooks/useBEP20ContractInfo';
 import { Box } from 'components/Box';
+import useSendBNBCallback from 'hooks/useSendBNB';
+import { useAddTrackingTokenCallback, useArrayTrackingTokens } from 'store/tokens/hooks';
+import useTokens from 'hooks/useTokens';
+import BigNumber from 'bignumber.js';
 
 export default function Func() {
-  const { activate, account, library } = useActiveWeb3React();
-  const addTransactionReceipt = useAddTransactionReceiptCallback();
-  const clearAllTransactionReceipts = useClearAllTransactionReceiptsCallback();
+  const renderTime = useRef(0);
+  // console.log(`Func render: ${++renderTime.current}`);
 
   // b1
+  const { activate, account } = useActiveWeb3React();
   const balance = useBNBBalance();
   const formattedBalance = balance ? getFullDisplayBalance(balance) : '--';
+  const trackingToken = useArrayTrackingTokens();
+  const tokenBalances = useTokenBalances();
 
   // b2
   const BEP20AddressRef = useRef<HTMLInputElement>(null);
   const [BEP20Address, setBEP20Address] = useState('');
-  const { name, symbol, decimals } = useBep20ContractInfo(BEP20Address) ?? {};
+  const memorizedBEP20Address = useMemo(() => [BEP20Address], [BEP20Address]);
+  const { name, symbol, decimals } = useTokens(memorizedBEP20Address)[0] ?? {};
+  const addTrackingToken = useAddTrackingTokenCallback();
 
   // b3
   const recipientAddressRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
+  const sendBNB = useSendBNBCallback();
 
   // b4
   const transactionReceipts = useTransactionReceipts();
+  const clearAllTransactionReceipts = useClearAllTransactionReceiptsCallback();
 
   return (
-    <Box style={{ maxWidth: '800px', margin: '100px auto 0' }}>
+    <Box style={{ maxWidth: '800px', margin: 'auto' }}>
       <p>b1: connect bsc testnet</p>
       <p>account: {account || '--'}</p>
       <p>balance: {formattedBalance} BNB</p>
+      {trackingToken.map(({ address, token }) => {
+        if (!token) return null;
+        const tokenBalance = tokenBalances[address];
+        return (
+          <p key={address}>
+            balance: {tokenBalance ? getFullDisplayBalance(new BigNumber(tokenBalance)) : '--'} {token.symbol}
+          </p>
+        );
+      })}
       <button
         type="button"
         onClick={() => {
@@ -61,12 +73,12 @@ export default function Func() {
 
       <hr />
 
-      <p>b2: input bep20 smart contract address, output its information</p>
+      <p>b2: input bep20 smart contract address, output its information, and add it to tracking token list</p>
       <input type="text" placeholder="Smart contract address" ref={BEP20AddressRef} />
       <p>
         Example:{' '}
         <a href="https://testnet.bscscan.com/token/0x82f1ffcdb31433b63aa311295a69892eebcdc2bb">
-          0x82f1ffcdb31433b63aa311295a69892eebcdc2bb
+          0x230e23f0744fE767aa628Fcbb6F079087DF23C1C
         </a>
       </p>
       <p>name: {name ?? '--'}</p>
@@ -78,6 +90,7 @@ export default function Func() {
           if (BEP20AddressRef.current) {
             if (isAddress(BEP20AddressRef.current.value)) {
               setBEP20Address(BEP20AddressRef.current.value);
+              addTrackingToken(BEP20AddressRef.current.value);
             } else {
               alert('Address not valid.');
             }
@@ -96,26 +109,8 @@ export default function Func() {
       <button
         type="button"
         onClick={async () => {
-          if (account && library && amountRef.current && recipientAddressRef.current) {
-            const recipientAddress = recipientAddressRef.current.value;
-            const amount = new BigNumber(amountRef.current.value);
-
-            if (!isAddress(recipientAddress)) {
-              alert('Invalid address.');
-              return;
-            }
-            if (balance && amount.isGreaterThan(balance)) {
-              alert('Value cannot greater than balance.');
-              return;
-            }
-
-            const signer = library.getSigner(account);
-            const transactionResponse: ethers.providers.TransactionResponse = await signer.sendTransaction({
-              from: account ?? undefined,
-              to: recipientAddress,
-              value: ethers.utils.parseEther(amountRef.current.value),
-            });
-            addTransactionReceipt(transactionResponse.hash);
+          if (amountRef.current && recipientAddressRef.current) {
+            sendBNB(recipientAddressRef.current.value, amountRef.current.value);
           }
         }}
         disabled={!account}
@@ -124,6 +119,7 @@ export default function Func() {
       </button>
 
       <hr />
+
       <p>b4: follow transaction status</p>
       <button type="button" onClick={clearAllTransactionReceipts}>
         clear
