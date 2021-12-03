@@ -2,6 +2,10 @@ import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 import { BIG_TEN } from 'config/constants';
 
+export function bigNumberToEthers(bn: BigNumber): ethers.BigNumber {
+  return ethers.BigNumber.from(bn.toString());
+}
+
 export function ethersToBigNumber(ethersBn: ethers.BigNumber): BigNumber {
   return new BigNumber(ethersBn.toString());
 }

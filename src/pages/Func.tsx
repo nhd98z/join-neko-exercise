@@ -1,24 +1,30 @@
-import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useMemo, useRef, useState } from 'react';
-import { useBNBBalance, useTokenBalances } from 'store/application/hooks';
-import { getFullDisplayBalance } from 'utils/bigNumber';
-import { useArrayTransactions, useClearAllTransactionsCallback } from 'store/transactions/hooks';
-import { injected } from 'config/web3';
-import { UnsupportedChainIdError } from '@web3-react/core';
-import setupNetwork from 'config/setupNetwork';
-import { isAddress } from 'ethers/lib/utils';
-import { Box } from 'components/Box';
-import useSendBNBCallback from 'hooks/useSendBNB';
-import { useAddTrackingTokenCallback, useArrayTrackingTokens } from 'store/tokens/hooks';
-import useTokens from 'hooks/useTokens';
 import BigNumber from 'bignumber.js';
+import { isAddress } from 'ethers/lib/utils';
+
+import { getFullDisplayBalance } from 'utils/bigNumber';
+
+import useSendBNBCallback from 'hooks/useSendBNB';
+import useTokens from 'hooks/useTokens';
+import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
+import useConnectWalletCallback from 'hooks/useConnectWalletCallback';
+
+import { useBNBBalance, useTokenBalances } from 'store/application/hooks';
+import { useArrayTransactions, useClearAllTransactionsCallback } from 'store/transactions/hooks';
+import { useAddTrackingTokenCallback, useArrayTrackingTokens, useTrackingTokens } from 'store/tokens/hooks';
+
+import { Box } from 'components/Box';
+import useSendTokenCallback from 'hooks/useSendTokenCallback';
+import { Currency, Token } from '@pancakeswap/sdk';
+import { deserializeToken } from 'store/tokens/helpers';
 
 export default function Func() {
   // b1
-  const { activate, account } = useActiveWeb3React();
+  const { account } = useActiveWeb3React();
+  const connectWallet = useConnectWalletCallback();
   const balance = useBNBBalance();
   const formattedBalance = balance ? getFullDisplayBalance(balance) : '--';
-  const trackingTokens = useArrayTrackingTokens();
+  const arrayTrackingTokens = useArrayTrackingTokens();
   const tokenBalances = useTokenBalances();
 
   // b2
@@ -29,9 +35,12 @@ export default function Func() {
   const addTrackingToken = useAddTrackingTokenCallback();
 
   // b3
+  const trackingTokens = useTrackingTokens();
   const recipientAddressRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
+  const [selectedToken, setSelectedToken] = useState<Token | undefined>();
   const sendBNB = useSendBNBCallback();
+  const sendToken = useSendTokenCallback(selectedToken);
 
   // b4
   const transactionReceipts = useArrayTransactions();
@@ -42,7 +51,7 @@ export default function Func() {
       <p>b1: connect bsc testnet</p>
       <p>account: {account || '--'}</p>
       <p>balance: {formattedBalance} BNB</p>
-      {trackingTokens.map(({ address, token }) => {
+      {arrayTrackingTokens.map(({ address, token }) => {
         if (!token) return null;
         const tokenBalance = tokenBalances[address];
         return (
@@ -51,20 +60,7 @@ export default function Func() {
           </p>
         );
       })}
-      <button
-        type="button"
-        onClick={() => {
-          activate(injected, async (error: Error) => {
-            if (error instanceof UnsupportedChainIdError) {
-              const hasSetup = await setupNetwork();
-              if (hasSetup) {
-                await activate(injected);
-              }
-            }
-          });
-        }}
-        disabled={!!account}
-      >
+      <button type="button" onClick={connectWallet} disabled={!!account}>
         connect
       </button>
 
@@ -74,7 +70,7 @@ export default function Func() {
       <input type="text" placeholder="Smart contract address" ref={BEP20AddressRef} />
       <p>
         Example:{' '}
-        <a href="https://testnet.bscscan.com/token/0x82f1ffcdb31433b63aa311295a69892eebcdc2bb">
+        <a href="https://testnet.bscscan.com/token/0x230e23f0744fE767aa628Fcbb6F079087DF23C1C">
           0x230e23f0744fE767aa628Fcbb6F079087DF23C1C
         </a>
       </p>
@@ -102,12 +98,29 @@ export default function Func() {
       <p>b3: send BNB to another address</p>
       <p>Example: 0xDa0D8fF1bE1F78c5d349722A5800622EA31CD5dd</p>
       <input type="text" placeholder="Recipient address" ref={recipientAddressRef} />
+      <select
+        style={{ height: '30px' }}
+        onChange={(e) =>
+          setSelectedToken(e.target.value === 'BNB' ? undefined : deserializeToken(trackingTokens[e.target.value]!))
+        }
+      >
+        <option value="BNB">BNB</option>
+        {arrayTrackingTokens.map(({ address, token }) => (
+          <option key={address} value={address}>
+            {token?.symbol}
+          </option>
+        ))}
+      </select>
       <input type="number" placeholder="Amount" ref={amountRef} step="0.01" min="0.01" />
       <button
         type="button"
         onClick={async () => {
           if (amountRef.current && recipientAddressRef.current) {
-            sendBNB(recipientAddressRef.current.value, amountRef.current.value);
+            if (selectedToken === Currency.ETHER) {
+              sendBNB(recipientAddressRef.current.value, amountRef.current.value);
+            } else {
+              sendToken(recipientAddressRef.current.value, amountRef.current.value);
+            }
           }
         }}
         disabled={!account}

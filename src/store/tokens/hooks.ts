@@ -7,6 +7,10 @@ import { Token } from '@pancakeswap/sdk';
 import { useSelector } from 'react-redux';
 import { serializeToken } from 'store/tokens/helpers';
 
+export function useTrackingTokens(): { [address: string]: SerializedToken | null | undefined } {
+  return useSelector<AppState, AppState['tokens']>((state) => state.tokens);
+}
+
 export function useArrayTrackingTokens(): { address: string; token: SerializedToken | null | undefined }[] {
   const trackingTokens = useSelector<AppState, AppState['tokens']>((state) => state.tokens);
 
