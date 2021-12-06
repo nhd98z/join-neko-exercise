@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { FAST_INTERVAL } from 'config/constants';
-import useIsWindowVisible from 'hooks/useIsWindowVisible';
+import useIsWindowVisible from 'hooks/memos/useIsWindowVisible';
 import {
   useGetBNBBalanceAndSyncToStoreCallback,
   useGetTokenBalancesAndSyncToStoreCallback,

@@ -1,12 +1,12 @@
 import { AppState, useAppDispatch } from 'store';
 import { useSelector } from 'react-redux';
-import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
+import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
 import { useCallback, useMemo } from 'react';
 import { updateBNBBalance, updateTokenBalance } from 'store/application/actions';
 import { ethersToBigNumberInstance } from 'utils/bigNumber';
 import BigNumber from 'bignumber.js';
 import { useArrayTrackingTokens } from 'store/tokens/hooks';
-import { useBEP20Contracts } from 'hooks/useContract';
+import { useBEP20Contracts } from 'hooks/memos/useContract';
 import { Contract } from 'ethers';
 
 /*********************************  BNB  *********************************/

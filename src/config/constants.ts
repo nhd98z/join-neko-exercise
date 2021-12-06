@@ -1,5 +1,3 @@
-import { ethers } from 'ethers';
-import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import { ChainId } from '@pancakeswap/sdk';
 
@@ -17,8 +15,6 @@ const NODE_4 = process.env.REACT_APP_NODE_4!;
 const NODE_5 = process.env.REACT_APP_NODE_5!;
 const NODE_6 = process.env.REACT_APP_NODE_6!;
 export const nodes = [NODE_1, NODE_2, NODE_3, NODE_4, NODE_5, NODE_6];
-
-export const simpleRpcProvider = new ethers.providers.StaticJsonRpcProvider(_.sample(nodes));
 
 export const FAST_INTERVAL = 6000;
 

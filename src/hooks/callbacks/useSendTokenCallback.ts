@@ -1,12 +1,12 @@
 import { useTokenBalances } from 'store/application/hooks';
-import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
+import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
 import { useAddTransactionCallback } from 'store/transactions/hooks';
 import { useCallback } from 'react';
 import invariant from 'tiny-invariant';
 import { isAddress } from 'ethers/lib/utils';
 import { bigNumberToEthers, getDecimalAmount } from 'utils/bigNumber';
 import BigNumber from 'bignumber.js';
-import { useBEP20Contracts } from 'hooks/useContract';
+import { useBEP20Contracts } from 'hooks/memos/useContract';
 import { ethers } from 'ethers';
 import { Token } from '@pancakeswap/sdk';
 

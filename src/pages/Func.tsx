@@ -4,17 +4,17 @@ import { isAddress } from 'ethers/lib/utils';
 
 import { getFullDisplayBalance } from 'utils/bigNumber';
 
-import useSendBNBCallback from 'hooks/useSendBNB';
-import useTokens from 'hooks/useTokens';
-import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
-import useConnectWalletCallback from 'hooks/useConnectWalletCallback';
+import useSendBNBCallback from 'hooks/callbacks/useSendBNBCallback';
+import useTokens from 'hooks/memos/useTokens';
+import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
+import useConnectWalletCallback from 'hooks/callbacks/useConnectWalletCallback';
 
 import { useBNBBalance, useTokenBalances } from 'store/application/hooks';
 import { useArrayTransactions, useClearAllTransactionsCallback } from 'store/transactions/hooks';
 import { useAddTrackingTokenCallback, useArrayTrackingTokens, useTrackingTokens } from 'store/tokens/hooks';
 
 import { Box } from 'components/Box';
-import useSendTokenCallback from 'hooks/useSendTokenCallback';
+import useSendTokenCallback from 'hooks/callbacks/useSendTokenCallback';
 import { Currency, Token } from '@pancakeswap/sdk';
 import { deserializeToken } from 'store/tokens/helpers';
 

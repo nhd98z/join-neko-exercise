@@ -3,7 +3,7 @@ import { isAddress } from 'ethers/lib/utils';
 import { useBNBBalance } from 'store/application/hooks';
 import invariant from 'tiny-invariant';
 import { ethers } from 'ethers';
-import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
+import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
 import { useCallback } from 'react';
 import { useAddTransactionCallback } from 'store/transactions/hooks';
 import { getDecimalAmount } from 'utils/bigNumber';

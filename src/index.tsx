@@ -16,6 +16,8 @@ BigNumber.config({
   DECIMAL_PLACES: 80,
 });
 
+window._store = store;
+
 function Updaters() {
   return (
     <>
@@ -25,8 +27,6 @@ function Updaters() {
     </>
   );
 }
-
-window._store = store;
 
 ReactDOM.render(
   <StrictMode>
