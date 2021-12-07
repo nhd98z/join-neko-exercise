@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 
 export interface ApplicationState {
   bnbBalance: BigNumber.Instance | undefined;
-  tokenBalances: {
+  trackingTokenBalances: {
     // Null means "Loading".
     // Undefined means "Not available | Can't fetch".
     [address: string]: BigNumber.Instance | null | undefined;
@@ -12,7 +12,7 @@ export interface ApplicationState {
 
 export const initialState: ApplicationState = {
   bnbBalance: undefined,
-  tokenBalances: {},
+  trackingTokenBalances: {},
 };
 
 const applicationSlice = createSlice({
@@ -24,7 +24,7 @@ const applicationSlice = createSlice({
     },
     updateTokenBalance: (state, action: PayloadAction<{ address: string; balance: BigNumber.Instance }>) => {
       const { address, balance } = action.payload;
-      state.tokenBalances[address] = balance;
+      state.trackingTokenBalances[address] = balance;
     },
   },
 });

@@ -5,38 +5,35 @@ import bep20Abi from 'config/abi/bep20.json';
 import { isAddress } from 'ethers/lib/utils';
 import useSimpleRpcProvider from 'hooks/memos/useSimpleRpcProvider';
 
-function useGetContractCallback() {
+export function useGetContractCallback() {
   const simpleRpcProvider = useSimpleRpcProvider();
 
   return useCallback(
-    (abi: any, address: string, signer?: ethers.Signer | ethers.providers.Provider) => {
+    (abi: any, address: string, signer?: ethers.Signer | ethers.providers.Provider): Contract | undefined => {
       const signerOrProvider = signer ?? simpleRpcProvider;
+      if (signerOrProvider === undefined) return undefined;
       return new ethers.Contract(address, abi, signerOrProvider);
     },
     [simpleRpcProvider]
   );
 }
 
-function useGetBEP20Contracts() {
+export function useGetBEP20ContractCallback() {
+  const { account, library } = useActiveWeb3React();
   const getContract = useGetContractCallback();
 
   return useCallback(
-    (address: string, signer?: ethers.Signer | ethers.providers.Provider) => getContract(bep20Abi, address, signer),
-    [getContract]
+    (address: string): Contract | undefined =>
+      getContract(bep20Abi, address, account && library ? library.getSigner(account) : library),
+    [getContract, account, library]
   );
 }
 
-export function useBEP20Contracts(addresses: string[]): (Contract | undefined)[] {
-  const { account, library } = useActiveWeb3React();
-  const getBEP20Contracts = useGetBEP20Contracts();
+export function useArrayBEP20Contracts(addresses: string[]): (Contract | undefined)[] {
+  const getBEP20Contract = useGetBEP20ContractCallback();
 
   return useMemo(
-    () =>
-      addresses.map((address) =>
-        isAddress(address)
-          ? getBEP20Contracts(address, account && library ? library.getSigner(account) : library)
-          : undefined
-      ),
-    [addresses, account, library, getBEP20Contracts]
+    () => addresses.map((address) => (isAddress(address) ? getBEP20Contract(address) : undefined)),
+    [addresses, getBEP20Contract]
   );
 }

@@ -6,7 +6,7 @@ import { updateBNBBalance, updateTokenBalance } from 'store/application';
 import { ethersToBigNumberInstance } from 'utils/bigNumber';
 import BigNumber from 'bignumber.js';
 import { useArrayTrackingTokens } from 'store/tokens/hooks';
-import { useBEP20Contracts } from 'hooks/memos/useContract';
+import { useArrayBEP20Contracts } from 'hooks/memos/useContract';
 import { Contract } from 'ethers';
 
 /*********************************  BNB  *********************************/
@@ -36,14 +36,16 @@ export function useGetBNBBalanceAndSyncToStoreCallback() {
 
 /*********************************  Token  *********************************/
 
-export function useTokenBalances(): { [address: string]: BigNumber.Instance | null | undefined } {
-  return useSelector<AppState, AppState['application']['tokenBalances']>((state) => state.application.tokenBalances);
+export function useTrackingTokenBalances(): { [address: string]: BigNumber.Instance | null | undefined } {
+  return useSelector<AppState, AppState['application']['trackingTokenBalances']>(
+    (state) => state.application.trackingTokenBalances
+  );
 }
 
 // For iterating convenient.
-export function useArrayTokenBalances(): { address: string; balance: BigNumber.Instance | null | undefined }[] {
-  const tokenBalances = useSelector<AppState, AppState['application']['tokenBalances']>(
-    (state) => state.application.tokenBalances
+export function useArrayTrackingTokenBalances(): { address: string; balance: BigNumber.Instance | null | undefined }[] {
+  const tokenBalances = useSelector<AppState, AppState['application']['trackingTokenBalances']>(
+    (state) => state.application.trackingTokenBalances
   );
 
   return useMemo(
@@ -59,18 +61,18 @@ export function useArrayTokenBalances(): { address: string; balance: BigNumber.I
   );
 }
 
-export function useTokenBalance(address?: string): BigNumber | null | undefined {
-  const tokenBalance = useSelector<AppState, AppState['application']['tokenBalances']>(
-    (state) => state.application.tokenBalances
+export function useTrackingTokenBalance(address?: string): BigNumber | null | undefined {
+  const tokenBalance = useSelector<AppState, AppState['application']['trackingTokenBalances']>(
+    (state) => state.application.trackingTokenBalances
   )[address ?? ''];
   return useMemo(() => tokenBalance && new BigNumber(tokenBalance), [tokenBalance]);
 }
 
-export function useGetTokenBalancesAndSyncToStoreCallback() {
+export function useGetTrackingTokenBalancesAndSyncToStoreCallback() {
   const { account } = useActiveWeb3React();
   const trackingTokens = useArrayTrackingTokens();
   const trackingTokenAddresses = trackingTokens.map(({ address }) => address);
-  const contracts = useBEP20Contracts(trackingTokenAddresses);
+  const contracts = useArrayBEP20Contracts(trackingTokenAddresses);
   const dispatch = useAppDispatch();
 
   return useCallback(() => {

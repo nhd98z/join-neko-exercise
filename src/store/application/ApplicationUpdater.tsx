@@ -3,14 +3,14 @@ import { FAST_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/memos/useIsWindowVisible';
 import {
   useGetBNBBalanceAndSyncToStoreCallback,
-  useGetTokenBalancesAndSyncToStoreCallback,
+  useGetTrackingTokenBalancesAndSyncToStoreCallback,
 } from 'store/application/hooks';
 
 export default function ApplicationUpdater() {
   const isWindowVisible = useIsWindowVisible();
   const timer = useRef<any>(null);
   const getBNBBalance = useGetBNBBalanceAndSyncToStoreCallback();
-  const getTokenBalances = useGetTokenBalancesAndSyncToStoreCallback();
+  const getTokenBalances = useGetTrackingTokenBalancesAndSyncToStoreCallback();
 
   useEffect(() => {
     const fetchData = () => {

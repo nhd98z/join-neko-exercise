@@ -3,20 +3,18 @@ import BigNumber from 'bignumber.js';
 import { isAddress } from 'ethers/lib/utils';
 
 import { getFullDisplayBalance } from 'utils/bigNumber';
-
-import useSendBNBCallback from 'hooks/callbacks/useSendBNBCallback';
 import useTokens from 'hooks/memos/useTokens';
 import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
 import useConnectWalletCallback from 'hooks/callbacks/useConnectWalletCallback';
 
-import { useBNBBalance, useTokenBalances } from 'store/application/hooks';
+import { useBNBBalance, useTrackingTokenBalances } from 'store/application/hooks';
 import { useArrayTransactions, useClearAllTransactionsCallback } from 'store/transactions/hooks';
 import { useAddTrackingTokenCallback, useArrayTrackingTokens, useTrackingTokens } from 'store/tokens/hooks';
 
 import { Box } from 'components/Box';
-import useSendTokenCallback from 'hooks/callbacks/useSendTokenCallback';
-import { Currency, Token } from '@pancakeswap/sdk';
+import { Currency } from '@pancakeswap/sdk';
 import { deserializeToken } from 'store/tokens/helpers';
+import useSendCurrencyCallback from 'hooks/callbacks/useSendCurrencyCallback';
 
 export default function Home() {
   // b1
@@ -25,7 +23,7 @@ export default function Home() {
   const balance = useBNBBalance();
   const formattedBalance = balance ? getFullDisplayBalance(balance) : '--';
   const arrayTrackingTokens = useArrayTrackingTokens();
-  const tokenBalances = useTokenBalances();
+  const tokenBalances = useTrackingTokenBalances();
 
   // b2
   const BEP20AddressRef = useRef<HTMLInputElement>(null);
@@ -38,9 +36,8 @@ export default function Home() {
   const trackingTokens = useTrackingTokens();
   const recipientAddressRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
-  const [selectedToken, setSelectedToken] = useState<Token | undefined>();
-  const sendBNB = useSendBNBCallback();
-  const sendToken = useSendTokenCallback(selectedToken);
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(Currency.ETHER);
+  const sendCurrency = useSendCurrencyCallback();
 
   // b4
   const transactionReceipts = useArrayTransactions();
@@ -101,7 +98,9 @@ export default function Home() {
       <select
         style={{ height: '30px' }}
         onChange={(e) =>
-          setSelectedToken(e.target.value === 'BNB' ? undefined : deserializeToken(trackingTokens[e.target.value]!))
+          setSelectedCurrency(
+            e.target.value === 'BNB' ? Currency.ETHER : deserializeToken(trackingTokens[e.target.value]!)
+          )
         }
       >
         <option value="BNB">BNB</option>
@@ -116,11 +115,7 @@ export default function Home() {
         type="button"
         onClick={async () => {
           if (amountRef.current && recipientAddressRef.current) {
-            if (selectedToken === Currency.ETHER) {
-              sendBNB(recipientAddressRef.current.value, amountRef.current.value);
-            } else {
-              sendToken(recipientAddressRef.current.value, amountRef.current.value);
-            }
+            sendCurrency(selectedCurrency, recipientAddressRef.current.value, amountRef.current.value);
           }
         }}
         disabled={!account}

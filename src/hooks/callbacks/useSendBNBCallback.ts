@@ -22,7 +22,7 @@ export default function useSendBNBCallback() {
 
       const signer = library.getSigner(account);
       const transactionResponse: ethers.providers.TransactionResponse = await signer.sendTransaction({
-        from: account ?? undefined,
+        from: account,
         to: recipientAddress,
         value: ethers.utils.parseEther(amountBNB),
       });

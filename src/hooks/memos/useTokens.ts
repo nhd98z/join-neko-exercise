@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useBEP20Contracts } from 'hooks/memos/useContract';
+import { useArrayBEP20Contracts } from 'hooks/memos/useContract';
 import { Token } from '@pancakeswap/sdk';
 import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
 import { CHAIN_ID } from 'config/constants';
 import { Contract } from 'ethers';
 
 export default function useTokens(addresses: string[]): (Token | null | undefined)[] {
-  const contracts = useBEP20Contracts(addresses);
+  const contracts = useArrayBEP20Contracts(addresses);
   const { chainId = CHAIN_ID } = useActiveWeb3React();
 
   const [tokens, setTokens] = useState<(Token | null | undefined)[]>(
