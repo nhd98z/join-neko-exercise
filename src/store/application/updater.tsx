@@ -20,7 +20,7 @@ export default function ApplicationUpdater() {
 
     if (isWindowVisible) {
       fetchData();
-      timer.current = setInterval(fetchData, FAST_INTERVAL);
+      timer.current = setInterval(fetchData, FAST_INTERVAL); // TODO: Chưa tối ưu: interval mới chạy mà fetch vẫn chưa xong.
     } else {
       clearInterval(timer.current);
     }

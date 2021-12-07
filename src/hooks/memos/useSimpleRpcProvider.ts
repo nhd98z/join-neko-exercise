@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FAST_INTERVAL, nodes } from 'config/constants';
+import { SUPER_FAST_INTERVAL, nodes } from 'config/constants';
 import { ethers } from 'ethers';
-import _ from 'lodash';
 
 const promises = [];
 for (let i = 0; i < nodes.length; i++) {
@@ -11,28 +10,32 @@ Promise.any(promises).then((response) => {
   window._workingNode = response.url;
 });
 
-const randomNode = _.sample(nodes);
-
-export default function useSimpleRpcProvider() {
-  const [workingNode, setWorkingNode] = useState<string>(window._workingNode ?? randomNode);
+export default function useSimpleRpcProvider(): ethers.providers.StaticJsonRpcProvider | undefined {
+  const [workingNode, setWorkingNode] = useState<string>(window._workingNode);
   const timer = useRef<any>(null);
 
   useEffect(() => {
     const updateWorkingNode = () => {
-      if (window._workingNode && workingNode !== window._workingNode) {
+      if (!workingNode && window._workingNode) {
         setWorkingNode(window._workingNode);
+      }
+      if (workingNode) {
+        clearInterval(timer.current);
       }
     };
 
-    updateWorkingNode();
-    timer.current = setInterval(() => {
+    if (!workingNode) {
       updateWorkingNode();
-    }, FAST_INTERVAL);
+      timer.current = setInterval(updateWorkingNode, SUPER_FAST_INTERVAL);
+    }
 
     return () => {
       clearInterval(timer.current);
     };
   }, [workingNode]);
 
-  return useMemo(() => new ethers.providers.StaticJsonRpcProvider(workingNode), [workingNode]);
+  return useMemo(
+    () => (workingNode ? new ethers.providers.StaticJsonRpcProvider(workingNode) : undefined),
+    [workingNode]
+  );
 }

@@ -1,12 +1,12 @@
 // eslint-disable-next-line import/no-unresolved
 import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
-import { Web3Provider } from '@ethersproject/providers';
 import { useWeb3React } from '@web3-react/core';
 import { useMemo } from 'react';
 import { CHAIN_ID } from 'config/constants';
 import useSimpleRpcProvider from 'hooks/memos/useSimpleRpcProvider';
+import { ethers } from 'ethers';
 
-export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> {
+export function useActiveWeb3React(): Web3ReactContextInterface<ethers.providers.JsonRpcProvider> {
   const provider = useWeb3React();
   const simpleRpcProvider = useSimpleRpcProvider();
 
