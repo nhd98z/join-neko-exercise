@@ -1,16 +1,35 @@
-import { useEffect, useRef } from 'react';
-import { FAST_INTERVAL } from 'config/constants';
+import { useCallback, useEffect } from 'react';
+import { SUPER_FAST_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/useIsWindowVisible';
 import {
+  useCurrentBlock,
   useGetBNBBalanceAndSyncToStoreCallback,
   useGetTrackingTokenBalancesAndSyncToStoreCallback,
+  useUpdateCurrentBlockCallback,
 } from 'store/application/hooks';
+import useInterval from 'hooks/useInterval';
+import useSimpleRpcProvider from 'hooks/useSimpleRpcProvider';
 
 export default function ApplicationUpdater() {
   const isWindowVisible = useIsWindowVisible();
-  const timer = useRef<any>(null);
   const getBNBBalance = useGetBNBBalanceAndSyncToStoreCallback();
   const getTokenBalances = useGetTrackingTokenBalancesAndSyncToStoreCallback();
+  const updateCurrentBlock = useUpdateCurrentBlockCallback();
+  const currentBlock = useCurrentBlock();
+  const simpleRpcProvider = useSimpleRpcProvider();
+
+  const callback = useCallback(() => {
+    const fetchBlock = async () => {
+      if (simpleRpcProvider) {
+        const newFetchedBlock = await simpleRpcProvider.getBlockNumber();
+        updateCurrentBlock(newFetchedBlock);
+      }
+    };
+
+    fetchBlock();
+  }, [simpleRpcProvider, updateCurrentBlock]);
+
+  useInterval(callback, isWindowVisible ? SUPER_FAST_INTERVAL : null, false);
 
   useEffect(() => {
     const fetchData = () => {
@@ -20,15 +39,8 @@ export default function ApplicationUpdater() {
 
     if (isWindowVisible) {
       fetchData();
-      timer.current = setInterval(fetchData, FAST_INTERVAL); // TODO: Chưa tối ưu: interval mới chạy mà fetch vẫn chưa xong.
-    } else {
-      clearInterval(timer.current);
     }
-
-    return () => {
-      clearInterval(timer.current);
-    };
-  }, [isWindowVisible, getBNBBalance, getTokenBalances]);
+  }, [isWindowVisible, getBNBBalance, getTokenBalances, currentBlock]);
 
   return null;
 }

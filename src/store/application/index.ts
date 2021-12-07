@@ -28,12 +28,12 @@ const applicationSlice = createSlice({
       const { address, balance } = action.payload;
       state.trackingTokenBalances[address] = balance;
     },
-    updateCurrentBlock: (state, action: PayloadAction<{ block: number }>) => {
-      state.currentBlock = action.payload.block;
+    updateCurrentBlock: (state, action: PayloadAction<{ newFetchedBlock: number }>) => {
+      state.currentBlock = action.payload.newFetchedBlock;
     },
   },
 });
 
-export const { updateBNBBalance, updateTokenBalance } = applicationSlice.actions;
+export const { updateBNBBalance, updateTokenBalance, updateCurrentBlock } = applicationSlice.actions;
 
 export default applicationSlice.reducer;

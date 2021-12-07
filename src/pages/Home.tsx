@@ -7,7 +7,7 @@ import useTokens from 'hooks/useTokens';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import useConnectWalletCallback from 'hooks/useConnectWalletCallback';
 
-import { useBNBBalance, useTrackingTokenBalances } from 'store/application/hooks';
+import { useBNBBalance, useCurrentBlock, useTrackingTokenBalances } from 'store/application/hooks';
 import { useArrayTransactions, useClearAllTransactionsCallback } from 'store/transactions/hooks';
 import { useAddTrackingTokenCallback, useArrayTrackingTokens, useTrackingTokens } from 'store/tokens/hooks';
 
@@ -17,6 +17,7 @@ import { deserializeToken } from 'store/tokens/helpers';
 import useSendCurrencyCallback from 'hooks/useSendCurrencyCallback';
 
 export default function Home() {
+  const currentBlock = useCurrentBlock();
   // b1
   const { account } = useActiveWeb3React();
   const connectWallet = useConnectWalletCallback();
@@ -45,6 +46,7 @@ export default function Home() {
 
   return (
     <Box style={{ maxWidth: '800px', margin: 'auto' }}>
+      <p>current block: {currentBlock}</p>
       <p>b1: connect bsc testnet</p>
       <p>account: {account || '--'}</p>
       <p>balance: {formattedBalance} BNB</p>
