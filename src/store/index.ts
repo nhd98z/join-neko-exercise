@@ -2,9 +2,9 @@ import { configureStore } from '@reduxjs/toolkit';
 import { load, save } from 'redux-localstorage-simple';
 import cloneDeep from 'lodash/cloneDeep';
 import { useDispatch } from 'react-redux';
-import application from 'store/application/reducer';
-import transactions, { initialState as transactionsInitialState } from 'store/transactions/reducer';
-import tokens, { initialState as tokenInitialState } from 'store/tokens/reducer';
+import application from 'store/application';
+import transactions, { initialState as transactionsInitialState } from 'store/transactions';
+import tokens, { initialState as tokenInitialState } from 'store/tokens';
 
 const PERSISTED_KEYS: string[] = ['transactions', 'tokens'];
 

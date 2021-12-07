@@ -18,7 +18,7 @@ import useSendTokenCallback from 'hooks/callbacks/useSendTokenCallback';
 import { Currency, Token } from '@pancakeswap/sdk';
 import { deserializeToken } from 'store/tokens/helpers';
 
-export default function Func() {
+export default function Home() {
   // b1
   const { account } = useActiveWeb3React();
   const connectWallet = useConnectWalletCallback();

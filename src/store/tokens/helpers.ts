@@ -1,5 +1,5 @@
 import { Token } from '@pancakeswap/sdk';
-import { SerializedToken } from 'store/tokens/actions';
+import { SerializedToken } from 'store/tokens';
 
 export function serializeToken(token: Token): SerializedToken {
   return {

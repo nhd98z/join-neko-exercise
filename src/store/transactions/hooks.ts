@@ -1,12 +1,7 @@
 import { AppState, useAppDispatch } from 'store';
 import { useSelector } from 'react-redux';
 import { useCallback, useMemo } from 'react';
-import {
-  addTransaction,
-  clearAllTransactions,
-  SerializedTransaction,
-  updateTransaction,
-} from 'store/transactions/actions';
+import { addTransaction, clearAllTransactions, SerializedTransaction, updateTransaction } from 'store/transactions';
 
 export function useArrayTransactions(): SerializedTransaction[] {
   const receipts = useSelector<AppState, AppState['transactions']>((state) => state.transactions);

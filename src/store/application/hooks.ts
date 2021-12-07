@@ -2,7 +2,7 @@ import { AppState, useAppDispatch } from 'store';
 import { useSelector } from 'react-redux';
 import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
 import { useCallback, useMemo } from 'react';
-import { updateBNBBalance, updateTokenBalance } from 'store/application/actions';
+import { updateBNBBalance, updateTokenBalance } from 'store/application';
 import { ethersToBigNumberInstance } from 'utils/bigNumber';
 import BigNumber from 'bignumber.js';
 import { useArrayTrackingTokens } from 'store/tokens/hooks';

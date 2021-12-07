@@ -6,6 +6,7 @@ import PhoneHolding from 'assets/phone-holding.png';
 import GamersDraft from 'assets/gamers-draft.svg';
 import GGPlay from 'assets/gg-play.png';
 import AppStore from 'assets/app-store.png';
+import Header from 'components/Header';
 
 const AbsoluteBackground = () => (
   <Box
@@ -36,9 +37,11 @@ const AbsolutePhoneHolding = () => (
   />
 );
 
-export default function Home() {
+export default function Landing() {
   return (
     <Box>
+      <Header />
+      <Box pb="106px" /> {/* 106px = Height of header */}
       <AbsoluteBackground />
       <AbsolutePhoneHolding />
       <Box style={{ position: 'absolute', left: '95px', top: '30%' }}>

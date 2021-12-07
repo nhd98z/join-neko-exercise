@@ -2,7 +2,7 @@ import { AppState, useAppDispatch } from 'store';
 import { useCallback, useMemo } from 'react';
 import invariant from 'tiny-invariant';
 import { isAddress } from 'ethers/lib/utils';
-import { addTrackingToken, removeTrackingToken, SerializedToken, updateTokenInformation } from 'store/tokens/actions';
+import { addTrackingToken, removeTrackingToken, SerializedToken, updateTrackingToken } from 'store/tokens';
 import { Token } from '@pancakeswap/sdk';
 import { useSelector } from 'react-redux';
 import { serializeToken } from 'store/tokens/helpers';
@@ -42,7 +42,7 @@ export function useUpdateTrackingTokenCallback() {
   const dispatch = useAppDispatch();
   return useCallback(
     (address: string, token: Token | null | undefined) => {
-      dispatch(updateTokenInformation({ address, token: token && serializeToken(token) }));
+      dispatch(updateTrackingToken({ address, token: token && serializeToken(token) }));
     },
     [dispatch]
   );
