@@ -5,7 +5,7 @@ import { useUpdateCurrentBlockCallback } from 'store/block/hooks';
 import useInterval from 'hooks/useInterval';
 import useSimpleRpcProvider from 'hooks/useSimpleRpcProvider';
 
-export default function ApplicationUpdater() {
+export default function BlockUpdater() {
   const isWindowVisible = useIsWindowVisible();
   const updateCurrentBlock = useUpdateCurrentBlockCallback();
   const simpleRpcProvider = useSimpleRpcProvider();

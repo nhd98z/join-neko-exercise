@@ -1,14 +1,10 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { SLOW_INTERVAL } from 'config/constants';
-import useIsWindowVisible from 'hooks/useIsWindowVisible';
+import { useEffect, useMemo } from 'react';
 import { useArrayTrackingTokens, useUpdateTrackingTokenCallback } from 'store/tokens/hooks';
 import useTokens from 'hooks/useTokens';
 import _ from 'lodash';
 import { serializeToken } from 'store/tokens/helpers';
 
 export default function TokensUpdater() {
-  const isWindowVisible = useIsWindowVisible();
-  const timer = useRef<any>(null);
   const updateTrackingToken = useUpdateTrackingTokenCallback();
 
   const trackingTokens = useArrayTrackingTokens();
@@ -16,26 +12,13 @@ export default function TokensUpdater() {
   const tokens = useTokens(trackingTokenAddresses);
 
   useEffect(() => {
-    const updateNewTokens = () => {
-      trackingTokens.forEach(({ address }, index) => {
-        const newToken = tokens[index];
-        if (newToken === null) return;
-        if (_.isEqual(newToken && serializeToken(newToken), trackingTokens[index].token)) return;
-        updateTrackingToken(address, newToken);
-      });
-    };
-
-    if (isWindowVisible) {
-      updateNewTokens();
-      timer.current = setInterval(updateNewTokens, SLOW_INTERVAL);
-    } else {
-      clearInterval(timer.current);
-    }
-
-    return () => {
-      clearInterval(timer.current);
-    };
-  }, [isWindowVisible, trackingTokens, updateTrackingToken, tokens]);
+    trackingTokens.forEach(({ address }, index) => {
+      const newToken = tokens[index];
+      if (newToken === null) return;
+      if (_.isEqual(newToken && serializeToken(newToken), trackingTokens[index].token)) return;
+      updateTrackingToken(address, newToken);
+    });
+  }, [tokens, trackingTokens, updateTrackingToken]);
 
   return null;
 }

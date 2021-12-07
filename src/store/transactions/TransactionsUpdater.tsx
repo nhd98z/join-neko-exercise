@@ -1,50 +1,40 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { SLOW_INTERVAL } from 'config/constants';
-import useIsWindowVisible from 'hooks/useIsWindowVisible';
+import { useEffect } from 'react';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useArrayTransactions, useUpdateTransactionCallback } from 'store/transactions/hooks';
 import { useGetBNBBalanceAndSyncToStoreCallback } from 'store/application/hooks';
+import { useCurrentBlock } from 'store/block/hooks';
 
 export default function TransactionsUpdater() {
-  const isWindowVisible = useIsWindowVisible();
-  const timer = useRef<any>(null);
   const { library } = useActiveWeb3React();
   const transactions = useArrayTransactions();
   const getBalance = useGetBNBBalanceAndSyncToStoreCallback();
   const updateTransaction = useUpdateTransactionCallback();
 
-  const getTransactions = useCallback(async () => {
-    if (library) {
-      transactions.forEach((transaction) => {
-        if (transaction.status !== undefined) return;
-
-        library.getTransactionReceipt(transaction.transactionHash).then((newTransaction) => {
-          if (newTransaction) {
-            updateTransaction({
-              transactionHash: newTransaction.transactionHash,
-              status: newTransaction.status,
-            });
-            if (newTransaction.status) {
-              getBalance();
-            }
-          }
-        });
-      });
-    }
-  }, [library, transactions, getBalance, updateTransaction]);
+  const currentBlock = useCurrentBlock();
 
   useEffect(() => {
-    if (isWindowVisible) {
-      getTransactions();
-      timer.current = setInterval(getTransactions, SLOW_INTERVAL);
-    } else {
-      clearInterval(timer.current);
-    }
+    const getTransactions = async () => {
+      if (library) {
+        transactions.forEach((transaction) => {
+          if (transaction.status !== undefined) return;
 
-    return () => {
-      clearInterval(timer.current);
+          library.getTransactionReceipt(transaction.transactionHash).then((newTransaction) => {
+            if (newTransaction) {
+              updateTransaction({
+                transactionHash: newTransaction.transactionHash,
+                status: newTransaction.status,
+              });
+              if (newTransaction.status) {
+                getBalance();
+              }
+            }
+          });
+        });
+      }
     };
-  }, [isWindowVisible, getTransactions]);
+
+    getTransactions();
+  }, [currentBlock, getBalance, library, transactions, updateTransaction]);
 
   return null;
 }
