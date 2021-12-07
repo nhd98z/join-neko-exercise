@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { FAST_INTERVAL } from 'config/constants';
-import useIsWindowVisible from 'hooks/memos/useIsWindowVisible';
-import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
+import useIsWindowVisible from 'hooks/useIsWindowVisible';
+import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useArrayTransactions, useUpdateTransactionCallback } from 'store/transactions/hooks';
 import { useGetBNBBalanceAndSyncToStoreCallback } from 'store/application/hooks';
 

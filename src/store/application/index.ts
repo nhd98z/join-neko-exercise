@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import BigNumber from 'bignumber.js';
 
 export interface ApplicationState {
+  currentBlock: number;
   bnbBalance: BigNumber.Instance | undefined;
   trackingTokenBalances: {
     // Null means "Loading".
@@ -11,6 +12,7 @@ export interface ApplicationState {
 }
 
 export const initialState: ApplicationState = {
+  currentBlock: 0,
   bnbBalance: undefined,
   trackingTokenBalances: {},
 };
@@ -25,6 +27,9 @@ const applicationSlice = createSlice({
     updateTokenBalance: (state, action: PayloadAction<{ address: string; balance: BigNumber.Instance }>) => {
       const { address, balance } = action.payload;
       state.trackingTokenBalances[address] = balance;
+    },
+    updateCurrentBlock: (state, action: PayloadAction<{ block: number }>) => {
+      state.currentBlock = action.payload.block;
     },
   },
 });

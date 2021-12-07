@@ -3,7 +3,7 @@ import { Web3ReactContextInterface } from '@web3-react/core/dist/types';
 import { useWeb3React } from '@web3-react/core';
 import { useMemo } from 'react';
 import { CHAIN_ID } from 'config/constants';
-import useSimpleRpcProvider from 'hooks/memos/useSimpleRpcProvider';
+import useSimpleRpcProvider from 'hooks/useSimpleRpcProvider';
 import { ethers } from 'ethers';
 
 export function useActiveWeb3React(): Web3ReactContextInterface<ethers.providers.JsonRpcProvider> {

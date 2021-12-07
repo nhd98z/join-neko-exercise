@@ -1,9 +1,9 @@
-import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
+import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useCallback, useMemo } from 'react';
 import { Contract, ethers } from 'ethers';
 import bep20Abi from 'config/abi/bep20.json';
 import { isAddress } from 'ethers/lib/utils';
-import useSimpleRpcProvider from 'hooks/memos/useSimpleRpcProvider';
+import useSimpleRpcProvider from 'hooks/useSimpleRpcProvider';
 
 export function useGetContractCallback() {
   const simpleRpcProvider = useSimpleRpcProvider();

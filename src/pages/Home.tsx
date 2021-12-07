@@ -3,9 +3,9 @@ import BigNumber from 'bignumber.js';
 import { isAddress } from 'ethers/lib/utils';
 
 import { getFullDisplayBalance } from 'utils/bigNumber';
-import useTokens from 'hooks/memos/useTokens';
-import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
-import useConnectWalletCallback from 'hooks/callbacks/useConnectWalletCallback';
+import useTokens from 'hooks/useTokens';
+import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
+import useConnectWalletCallback from 'hooks/useConnectWalletCallback';
 
 import { useBNBBalance, useTrackingTokenBalances } from 'store/application/hooks';
 import { useArrayTransactions, useClearAllTransactionsCallback } from 'store/transactions/hooks';
@@ -14,7 +14,7 @@ import { useAddTrackingTokenCallback, useArrayTrackingTokens, useTrackingTokens 
 import { Box } from 'components/Box';
 import { Currency } from '@pancakeswap/sdk';
 import { deserializeToken } from 'store/tokens/helpers';
-import useSendCurrencyCallback from 'hooks/callbacks/useSendCurrencyCallback';
+import useSendCurrencyCallback from 'hooks/useSendCurrencyCallback';
 
 export default function Home() {
   // b1

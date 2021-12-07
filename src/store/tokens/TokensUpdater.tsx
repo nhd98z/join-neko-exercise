@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { FAST_INTERVAL } from 'config/constants';
-import useIsWindowVisible from 'hooks/memos/useIsWindowVisible';
+import useIsWindowVisible from 'hooks/useIsWindowVisible';
 import { useArrayTrackingTokens, useUpdateTrackingTokenCallback } from 'store/tokens/hooks';
-import useTokens from 'hooks/memos/useTokens';
+import useTokens from 'hooks/useTokens';
 import _ from 'lodash';
 import { serializeToken } from 'store/tokens/helpers';
 

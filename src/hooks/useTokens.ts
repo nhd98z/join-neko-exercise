@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useArrayBEP20Contracts } from 'hooks/memos/useContract';
+import { useArrayBEP20Contracts } from 'hooks/useContract';
 import { Token } from '@pancakeswap/sdk';
-import { useActiveWeb3React } from 'hooks/memos/useActiveWeb3React';
+import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { CHAIN_ID } from 'config/constants';
 import { Contract } from 'ethers';
 
