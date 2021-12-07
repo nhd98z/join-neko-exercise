@@ -2,7 +2,7 @@ import { AppState, useAppDispatch } from 'store';
 import { useSelector } from 'react-redux';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useCallback, useMemo } from 'react';
-import { updateBNBBalance, updateCurrentBlock, updateTokenBalance } from 'store/application';
+import { updateBNBBalance, updateTokenBalance } from 'store/application';
 import { ethersToBigNumberInstance } from 'utils/bigNumber';
 import BigNumber from 'bignumber.js';
 import { useArrayTrackingTokens } from 'store/tokens/hooks';
@@ -91,26 +91,4 @@ export function useGetTrackingTokenBalancesAndSyncToStoreCallback() {
 
     Promise.allSettled(promises);
   }, [account, contracts, dispatch, trackingTokenAddresses]);
-}
-
-export function useCurrentBlock() {
-  const currentBlock = useSelector<AppState, AppState['application']['currentBlock']>(
-    (state) => state.application.currentBlock
-  );
-
-  return currentBlock;
-}
-
-export function useUpdateCurrentBlockCallback() {
-  const dispatch = useAppDispatch();
-  const currentBlock = useCurrentBlock();
-
-  return useCallback(
-    (newFetchedBlock: number) => {
-      if (currentBlock !== newFetchedBlock) {
-        dispatch(updateCurrentBlock({ newFetchedBlock }));
-      }
-    },
-    [dispatch, currentBlock]
-  );
 }

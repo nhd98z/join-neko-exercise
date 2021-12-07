@@ -16,7 +16,7 @@ const NODE_5 = process.env.REACT_APP_NODE_5!;
 const NODE_6 = process.env.REACT_APP_NODE_6!;
 export const nodes = [NODE_1, NODE_2, NODE_3, NODE_4, NODE_5, NODE_6];
 
-export const SUPER_FAST_INTERVAL = 300;
-export const FAST_INTERVAL = 3000;
+export const FAST_INTERVAL = 300;
+export const SLOW_INTERVAL = 3000;
 
 export const BIG_TEN = new BigNumber(10);

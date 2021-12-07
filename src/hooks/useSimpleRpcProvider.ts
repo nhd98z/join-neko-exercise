@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { SUPER_FAST_INTERVAL, nodes } from 'config/constants';
+import { FAST_INTERVAL, nodes } from 'config/constants';
 import { ethers } from 'ethers';
 
 const promises = [];
@@ -26,7 +26,7 @@ export default function useSimpleRpcProvider(): ethers.providers.StaticJsonRpcPr
 
     if (!workingNode) {
       updateWorkingNode();
-      timer.current = setInterval(updateWorkingNode, SUPER_FAST_INTERVAL);
+      timer.current = setInterval(updateWorkingNode, FAST_INTERVAL);
     }
 
     return () => {

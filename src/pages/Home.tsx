@@ -7,7 +7,8 @@ import useTokens from 'hooks/useTokens';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import useConnectWalletCallback from 'hooks/useConnectWalletCallback';
 
-import { useBNBBalance, useCurrentBlock, useTrackingTokenBalances } from 'store/application/hooks';
+import { useBNBBalance, useTrackingTokenBalances } from 'store/application/hooks';
+import { useCurrentBlock } from 'store/block/hooks';
 import { useArrayTransactions, useClearAllTransactionsCallback } from 'store/transactions/hooks';
 import { useAddTrackingTokenCallback, useArrayTrackingTokens, useTrackingTokens } from 'store/tokens/hooks';
 

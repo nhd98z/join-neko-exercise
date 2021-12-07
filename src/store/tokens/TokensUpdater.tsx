@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { FAST_INTERVAL } from 'config/constants';
+import { SLOW_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/useIsWindowVisible';
 import { useArrayTrackingTokens, useUpdateTrackingTokenCallback } from 'store/tokens/hooks';
 import useTokens from 'hooks/useTokens';
@@ -27,7 +27,7 @@ export default function TokensUpdater() {
 
     if (isWindowVisible) {
       updateNewTokens();
-      timer.current = setInterval(updateNewTokens, FAST_INTERVAL);
+      timer.current = setInterval(updateNewTokens, SLOW_INTERVAL);
     } else {
       clearInterval(timer.current);
     }

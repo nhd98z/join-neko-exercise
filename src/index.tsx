@@ -5,6 +5,7 @@ import { getLibrary } from 'config/web3';
 import { Provider } from 'react-redux';
 import store from 'store';
 import ApplicationUpdater from 'store/application/ApplicationUpdater';
+import BlockUpdater from 'store/block/BlockUpdater';
 import TransactionsUpdater from 'store/transactions/TransactionsUpdater';
 import TokensUpdater from 'store/tokens/TokensUpdater';
 import App from 'pages/App';
@@ -22,6 +23,7 @@ function Updaters() {
   return (
     <>
       <ApplicationUpdater />
+      <BlockUpdater />
       <TransactionsUpdater />
       <TokensUpdater />
     </>

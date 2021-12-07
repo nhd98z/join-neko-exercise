@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { FAST_INTERVAL } from 'config/constants';
+import { SLOW_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/useIsWindowVisible';
 import { useActiveWeb3React } from 'hooks/useActiveWeb3React';
 import { useArrayTransactions, useUpdateTransactionCallback } from 'store/transactions/hooks';
@@ -36,7 +36,7 @@ export default function TransactionsUpdater() {
   useEffect(() => {
     if (isWindowVisible) {
       getTransactions();
-      timer.current = setInterval(getTransactions, FAST_INTERVAL);
+      timer.current = setInterval(getTransactions, SLOW_INTERVAL);
     } else {
       clearInterval(timer.current);
     }
