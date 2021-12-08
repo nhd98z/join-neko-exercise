@@ -1,9 +1,10 @@
 import reducer, { updateBNBBalance } from 'store/application';
 import { ethersToBigNumberInstance } from 'utils/bigNumber';
 import { ethers } from 'ethers';
+import { Action } from '@reduxjs/toolkit';
 
 test('Return initial state of application', () => {
-  expect(reducer(undefined, {})).toEqual({
+  expect(reducer(undefined, {} as Action)).toEqual({
     bnbBalance: undefined,
     trackingTokenBalances: {},
   });
