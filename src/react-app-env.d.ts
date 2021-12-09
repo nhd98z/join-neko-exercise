@@ -9,5 +9,5 @@ interface Window {
     bnbSign?: (address: string, message: string) => Promise<{ publicKey: string; signature: string }>;
   };
   _store: unknown;
-  _workingNode: string;
+  _workingNode?: string;
 }

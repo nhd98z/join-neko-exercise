@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { FAST_INTERVAL } from 'config/constants';
+import { SLOW_INTERVAL } from 'config/constants';
 import useIsWindowVisible from 'hooks/useIsWindowVisible';
 import { useUpdateCurrentBlockCallback } from 'store/block/hooks';
 import useInterval from 'hooks/useInterval';
@@ -21,7 +21,7 @@ export default function BlockUpdater() {
     fetchBlock();
   }, [simpleRpcProvider, updateCurrentBlock]);
 
-  useInterval(callback, isWindowVisible ? FAST_INTERVAL : null, false);
+  useInterval(callback, isWindowVisible ? SLOW_INTERVAL : null, true);
 
   return null;
 }

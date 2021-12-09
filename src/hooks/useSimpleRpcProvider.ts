@@ -11,7 +11,7 @@ Promise.any(promises).then((response) => {
 });
 
 export default function useSimpleRpcProvider(): ethers.providers.StaticJsonRpcProvider | undefined {
-  const [workingNode, setWorkingNode] = useState<string>(window._workingNode);
+  const [workingNode, setWorkingNode] = useState<string | undefined>(window._workingNode);
   const timer = useRef<any>(null);
 
   useEffect(() => {
